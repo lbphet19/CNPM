@@ -13,4 +13,6 @@ import team.cnpm.models.SoHoKhau;
 public interface SoHoKhauRepository extends JpaRepository<SoHoKhau, String>, JpaSpecificationExecutor<SoHoKhau> {
 	@Query("SELECT shk FROM SoHoKhau shk WHERE shk.id = ?1")
 	SoHoKhau findBySHKId(String id);
+	
+	boolean existsById(String id);
 }

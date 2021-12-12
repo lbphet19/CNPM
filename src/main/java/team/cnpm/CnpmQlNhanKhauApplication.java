@@ -1,5 +1,7 @@
 package team.cnpm;
 
+import java.util.Random;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -16,5 +18,6 @@ public class CnpmQlNhanKhauApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CnpmQlNhanKhauApplication.class, args);
 	}
-
+	//generate 9-digit
+	
 }

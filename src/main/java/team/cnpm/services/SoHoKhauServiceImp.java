@@ -24,9 +24,13 @@ import team.cnpm.models.SoHoKhauHistory;
 import team.cnpm.repositories.CongDanRepository;
 import team.cnpm.repositories.SoHoKhauRepository;
 import team.cnpm.specifications.SHKSpecification;
+import team.cnpm.utils.IdSHKGenerator;
 
 @Service
 public class SoHoKhauServiceImp implements SoHoKhauService {
+	
+	@Autowired
+	private IdSHKGenerator idGenerator;
 	@Autowired
 	private SoHoKhauHistoryService shkHistoryService;
 
@@ -44,6 +48,12 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 	}
 
 	public SoHoKhau save(SoHoKhau hoKhau) {
+//		gen random string
+		String shkId;
+		do {
+			shkId = this.idGenerator.getSaltString();
+		} while (this.hoKhauRepo.existsById(shkId));
+		hoKhau.setId(shkId);
 		return this.hoKhauRepo.save(hoKhau);
 	}
 

@@ -69,8 +69,7 @@ public class SoHoKhauController {
 	@PostMapping("/hoKhau")
 	public ResponseEntity<ResponseDTO> post(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO){
 		try {
-			SoHoKhau hoKhauCreate = new SoHoKhau(soHoKhauRequestDTO.getId(),
-					soHoKhauRequestDTO.getAddress());
+			SoHoKhau hoKhauCreate = new SoHoKhau(soHoKhauRequestDTO.getAddress());
 			hoKhauCreate = this.soHoKhauService.save(hoKhauCreate);
 			SoHoKhau hoKhauUpdate = this.soHoKhauService.updateMembers(hoKhauCreate,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembersId());
