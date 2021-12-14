@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import team.cnpm.DTOs.request.CongDanOfSHKRequestDTO;
 import team.cnpm.DTOs.request.SoHoKhauRequestDTO;
 import team.cnpm.DTOs.response.CongDanOfSHK_DTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
@@ -28,7 +29,7 @@ import team.cnpm.utils.IdSHKGenerator;
 
 @Service
 public class SoHoKhauServiceImp implements SoHoKhauService {
-	
+
 	@Autowired
 	private IdSHKGenerator idGenerator;
 	@Autowired
@@ -80,22 +81,23 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		}
 	}
 
-	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<Integer> membersId) {
-		if (idChuHo == 0) {
-			this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()), "Rời đi",
-					hoKhau.getOwner(), hoKhau, null));
-			hoKhau.getOwner().setHoKhauSoHuu(null);
-			hoKhau.setOwner(null);
-		}
-		CongDan chuHo;
+	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<CongDanOfSHKRequestDTO> members) {
+		List<Integer> membersId = members.stream().map(congDan -> congDan.getId()).collect(Collectors.toList());
+//		if (idChuHo == 0) {
+//			if (hoKhau.getOwner() != null) {
+//				this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()), "Rời đi",
+//						hoKhau.getOwner(), hoKhau, null));
+//				hoKhau.getOwner().setHoKhauSoHuu(null);
+//				hoKhau.setOwner(null);
+//			}
+//		}
+		CongDan chuHo = this.congDanRepo.findById(idChuHo).get();
 		CongDan oldChuHo = hoKhau.getOwner();
-		if (idChuHo != 0)
-			chuHo = this.congDanRepo.findById(idChuHo).get();
-		else
-			chuHo = new CongDan();
+//		if (idChuHo != 0)
+//			chuHo = this.congDanRepo.findById(idChuHo).get();
+//		else
+//			chuHo = null;
 		if (hoKhau.getOwner() == null || idChuHo != hoKhau.getOwner().getId()) {
-//			if (idChuHo != 0)
-//				chuHo = this.congDanRepo.findById(idChuHo).get();
 			// set chu Ho 1-1 voi ho khau
 			// check chuyen den, roi di...
 
@@ -109,7 +111,8 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 				if (chuHo.getHoKhauSoHuu() == null) {
 					this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()),
 							"Chuyển đến", chuHo, null, hoKhau));
-				};
+				}
+				;
 
 				if (chuHo.getHoKhauSoHuu() != null) {
 					this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()),
@@ -120,17 +123,11 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 					this.hoKhauRepo.save(oldHoKhau);
 				}
 			}
+
 			chuHo.setHoKhau(hoKhau);
 			hoKhau.setOwner(chuHo);
+			chuHo.setRelationship("Chủ hộ");
 
-//			if(idChuHo == 0) {
-//				this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()), "Rời đi",
-//						hoKhau.getOwner(), hoKhau, null));
-//				hoKhau.getOwner().setHoKhauSoHuu(null);
-//				hoKhau.setOwner(null);
-//			}
-//				chuHo.setHoKhauSoHuu(hoKhau);
-//				hoKhau.setOwner(chuHo);
 		}
 //		them chu ho vao list thanh vien moi
 		if (!membersId.contains(idChuHo)) {
@@ -144,6 +141,21 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		List<Integer> membersToRemove = this.findUniqueElements(oldMembersId, membersId);
 		List<Integer> membersToUpdate = this.findUniqueElements(membersId, oldMembersId);
 		// update ho khau thanh vien
+		this.updateNewMembers(membersToUpdate, chuHo, hoKhau);
+		this.removeOldMembers(membersToRemove, oldChuHo, hoKhau);
+//		 update relations
+		for(CongDanOfSHKRequestDTO cd:members) {
+			this.congDanService.updateRelationship(cd);
+		}
+//		members.stream().map(congDan -> this.congDanService.updateRelationship(congDan));
+		return this.hoKhauRepo.save(hoKhau);
+	}
+
+	public SoHoKhau dtoToEntity(SoHoKhauRequestDTO dto) {
+		return new SoHoKhau(dto.getId(), dto.getAddress());
+	}
+
+	private void updateNewMembers(List<Integer> membersToUpdate, CongDan chuHo, SoHoKhau hoKhau) {
 		if (membersToUpdate != null) {
 			membersToUpdate.stream().map(id -> this.congDanRepo.findById(id).get()).forEach(congDan -> {
 				if (!congDan.equals(chuHo)) {
@@ -152,28 +164,27 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 				}
 				// congdan remove ho khau cu
 				// them vao lichsu(congdan,ho cu,roidi);(congdan, ho moi, den);
-				congDan.setHoKhau(null);
+//				congDan.setHoKhau(null);
 				hoKhau.addMember(congDan);
 			});
 		}
+	}
+
+	private void removeOldMembers(List<Integer> membersToRemove, CongDan oldChuHo, SoHoKhau hoKhau) {
 		if (membersToRemove != null) {
 			membersToRemove.stream().map(id -> this.congDanRepo.findById(id).get()).forEach(congDan -> {
-				if(!congDan.equals(oldChuHo)) {
-				this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()), "Rời đi",
-						congDan, hoKhau, null));
+				if (!congDan.equals(oldChuHo)) {
+					this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()),
+							"Rời đi", congDan, hoKhau, null));
 				}
 				hoKhau.removeMember(congDan);
+				congDan.setRelationship(null);
+				this.congDanService.updateRelationship(congDan);
 			});
 		}
-
-		return this.hoKhauRepo.save(hoKhau);
 	}
 
-	public SoHoKhau dtoToEntity(SoHoKhauRequestDTO dto) {
-		return new SoHoKhau(dto.getId(), dto.getAddress());
-	}
-
-	// loc cac element trong list1 ko co trong list2
+//loc cac element trong list1 ko co trong list2
 	private List<Integer> findUniqueElements(List<Integer> list1, List<Integer> list2) {
 		if (list1 == null)
 			return null;

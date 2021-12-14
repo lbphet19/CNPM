@@ -10,7 +10,7 @@ public class SoHoKhauRequestDTO {
 	private String id;
 	private String address;
 	private Integer ownerId; //owner's id
-	private List<Integer> membersId = new ArrayList<Integer>(); //members' id
+	private List<CongDanOfSHKRequestDTO> members = new ArrayList<CongDanOfSHKRequestDTO>(); //members' id
 //	private CongDan owner;
 //	private List<CongDan> members = new ArrayList<CongDan>();
 	
@@ -33,22 +33,32 @@ public class SoHoKhauRequestDTO {
 	public void setOwnerId(int ownerId) {
 		this.ownerId = ownerId;
 	}
-	public List<Integer> getMembersId() {
-		return membersId;
+	
+	public List<CongDanOfSHKRequestDTO> getMembers() {
+		return members;
 	}
-	public void setMembersId(List<Integer> membersId) {
-		this.membersId = membersId;
+	public void setMembers(List<CongDanOfSHKRequestDTO> members) {
+		this.members = members;
 	}
-	public SoHoKhauRequestDTO(String address, int ownerId, List<Integer> membersId) {
+	
+	public SoHoKhauRequestDTO(String address, Integer ownerId, List<CongDanOfSHKRequestDTO> members) {
 		super();
 		this.address = address;
 		this.ownerId = ownerId;
-		this.membersId = membersId;
+		this.members = members;
 	}
 	public SoHoKhauRequestDTO(String address, Integer ownerId) {
 		super();
 		this.address = address;
 		this.ownerId = ownerId;
+	}
+	
+	public SoHoKhauRequestDTO(String id, String address, Integer ownerId, List<CongDanOfSHKRequestDTO> members) {
+		super();
+		this.id = id;
+		this.address = address;
+		this.ownerId = ownerId;
+		this.members = members;
 	}
 	public SoHoKhauRequestDTO() {
 		super();

@@ -19,6 +19,7 @@ import team.cnpm.models.CongDan;
 import team.cnpm.models.SoHoKhau;
 
 public class CongDanResponseDTO{
+	private int id;
 	private String canCuocCongDan;
 	private String phoneNumber;
 	private String firstName;
@@ -31,9 +32,10 @@ public class CongDanResponseDTO{
 	private String idSHK;
 	
 	
-	public CongDanResponseDTO(String canCuocCongDan, String phoneNumber, String firstName, String lastName,
+	public CongDanResponseDTO(int id, String canCuocCongDan, String phoneNumber, String firstName, String lastName,
 			String address, Date dateOfBirth, String gender, String job, String image, String idSHK) {
 		super();
+		this.id = id;
 		this.canCuocCongDan = canCuocCongDan;
 		this.phoneNumber = phoneNumber;
 		this.firstName = firstName;
@@ -104,6 +106,12 @@ public class CongDanResponseDTO{
 	}
 	public void setIdSHK(String idSHK) {
 		this.idSHK = idSHK;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

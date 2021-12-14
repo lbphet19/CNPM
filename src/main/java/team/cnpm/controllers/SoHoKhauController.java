@@ -72,7 +72,7 @@ public class SoHoKhauController {
 			SoHoKhau hoKhauCreate = new SoHoKhau(soHoKhauRequestDTO.getAddress());
 			hoKhauCreate = this.soHoKhauService.save(hoKhauCreate);
 			SoHoKhau hoKhauUpdate = this.soHoKhauService.updateMembers(hoKhauCreate,
-					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembersId());
+					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
 			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdate));
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,7 +85,7 @@ public class SoHoKhauController {
 	public ResponseEntity<ResponseDTO> put(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO){
 		SoHoKhau hoKhauUpdate = this.soHoKhauService.update(soHoKhauRequestDTO);
 		SoHoKhau hoKhauUpdateMembers = this.soHoKhauService.updateMembers(hoKhauUpdate,
-					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembersId());
+					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
 			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdateMembers));
 //			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
 //					,HttpStatus.EXPECTATION_FAILED);

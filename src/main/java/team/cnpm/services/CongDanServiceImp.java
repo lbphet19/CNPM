@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import team.cnpm.DTOs.request.CongDanOfSHKRequestDTO;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanOfSHK_DTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
@@ -64,7 +65,7 @@ public class CongDanServiceImp implements CongDanService {
 
 
 	public CongDanResponseDTO entityToDTO(CongDan cd) {
-		return new CongDanResponseDTO(cd.getCanCuocCongDan(), cd.getPhoneNumber(), cd.getFirstName(), 
+		return new CongDanResponseDTO(cd.getId(),cd.getCanCuocCongDan(), cd.getPhoneNumber(), cd.getFirstName(), 
 				cd.getLastName(), cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
 				cd.getImage(), cd.getHoKhau()==null ? null : cd.getHoKhau().getId());
 	}
@@ -114,6 +115,22 @@ public class CongDanServiceImp implements CongDanService {
 		Page<CongDan> page= this.congDanRepo.findAll(spec,pageable);
 		 cdan =page.getContent();
 		return cdan;
+	}
+
+	@Override
+	public CongDan updateRelationship(CongDan congDan) {
+		// TODO Auto-generated method stub
+		CongDan congDanUpdate = this.congDanRepo.findById(congDan.getId()).get();
+		congDanUpdate.setRelationship(congDan.getRelationship());
+		return this.congDanRepo.save(congDanUpdate);
+	}
+
+	@Override
+	public CongDan updateRelationship(CongDanOfSHKRequestDTO congDan) {
+		// TODO Auto-generated method stub
+		CongDan congDanUpdate = this.congDanRepo.findById(congDan.getId()).get();
+		congDanUpdate.setRelationship(congDan.getRelationship());
+		return this.congDanRepo.save(congDanUpdate);
 	}
 
 }
