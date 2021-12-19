@@ -9,6 +9,7 @@ public class CongDanOfSHK_DTO {
 	private String lastName;
 	private String address;
 	private Date dateOfBirth;
+	private String phoneNumber;
 	private String gender; //MALE,FEMALE
 	private String job;
 	private String relationship;
@@ -114,6 +115,36 @@ public class CongDanOfSHK_DTO {
 		return image;
 	}
 	public void setImage(String image) {
+		this.image = image;
+	}
+
+
+	public String getPhoneNumber() {
+		return phoneNumber;
+	}
+
+
+	public void setPhoneNumber(String phoneNumber) {
+		this.phoneNumber = phoneNumber;
+	}
+
+
+	public CongDanOfSHK_DTO(int id, String canCuocCongDan, String firstName, String lastName, String address,
+			Date dateOfBirth, String phoneNumber, String gender, String job, String relationship, String specialNotes,
+			String status, String image) {
+		super();
+		this.id = id;
+		this.canCuocCongDan = canCuocCongDan;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.dateOfBirth = dateOfBirth;
+		this.phoneNumber = phoneNumber;
+		this.gender = gender;
+		this.job = job;
+		this.relationship = relationship;
+		this.specialNotes = specialNotes;
+		this.status = status;
 		this.image = image;
 	}
 	

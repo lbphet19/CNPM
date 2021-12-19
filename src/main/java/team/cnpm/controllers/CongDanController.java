@@ -164,9 +164,9 @@ public class CongDanController {
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname, 
 			@RequestParam(name="phonenumber", required=false) String sdt,
-			@RequestParam(name = "sortD", required = false) int sortD,
-			@RequestParam(name = "sortBy", required = false) String sortBy,
-			@RequestParam(name = "page", required = false) int page){
+			@RequestParam(name = "sortD", required = false, defaultValue = "1") int sortD,
+			@RequestParam(name = "sortBy", required = false, defaultValue = "firstName") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page){
 		Pageable pageable;
 		if(sortD==1) {
 			  pageable =  PageRequest.of(page-1, 3, Direction.DESC, sortBy);}

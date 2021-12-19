@@ -22,6 +22,11 @@ public class GlobalExceptionHandler {
     	return ResponseEntity.status(500).body(new ResponseDTO(false,"access is denied!"));
     }
     
+    @ExceptionHandler(OwnerNotAvailableException.class)
+    public ResponseEntity<ResponseDTO> handleOwnerNotAvailableException(OwnerNotAvailableException e){
+    	return ResponseEntity.status(400).body(new ResponseDTO(false,"Người này đã là chủ hộ của một hộ khác!"));
+    }
+    
     // Nên bắt cả Exception.class
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ResponseDTO> handleUnwantedException(Exception e) {

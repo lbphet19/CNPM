@@ -82,7 +82,7 @@ public class CongDanServiceImp implements CongDanService {
 	
 	public CongDanOfSHK_DTO entityToCDofSHK_DTO(CongDan cd) {
 		return new CongDanOfSHK_DTO(cd.getId(), cd.getCanCuocCongDan(), cd.getFirstName(), cd.getLastName(), 
-				cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(),  cd.getRelationship(),
+				cd.getAddress(), cd.getDateOfBirth(), cd.getPhoneNumber(), cd.getGender(), cd.getJob(),  cd.getRelationship(),
 				cd.getSpecialNotes(), cd.getStatus(), cd.getImage());
 	}
 	

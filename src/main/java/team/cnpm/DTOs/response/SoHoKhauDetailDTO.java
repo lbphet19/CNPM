@@ -4,7 +4,7 @@ import java.util.List;
 
 public class SoHoKhauDetailDTO {
 	private String id;
-	private String ownerName;
+	private String owner;
 	private String address;
 	private String contact;
 	private int soTVien;
@@ -12,11 +12,11 @@ public class SoHoKhauDetailDTO {
 	
 	
 	
-	public SoHoKhauDetailDTO(String id, String ownerName, String address, String contact, int soTVien,
+	public SoHoKhauDetailDTO(String id, String owner, String address, String contact, int soTVien,
 			List<CongDanOfSHK_DTO> members) {
 		super();
 		this.id = id;
-		this.ownerName = ownerName;
+		this.owner = owner;
 		this.address = address;
 		this.contact = contact;
 		this.soTVien = soTVien;
@@ -28,11 +28,11 @@ public class SoHoKhauDetailDTO {
 	public void setId(String id) {
 		this.id = id;
 	}
-	public String getOwnerName() {
-		return ownerName;
+	public String getOwner() {
+		return owner;
 	}
-	public void setOwnerName(String ownerName) {
-		this.ownerName = ownerName;
+	public void setOwner(String ownerName) {
+		this.owner = ownerName;
 	}
 	public String getAddress() {
 		return address;

@@ -12,8 +12,11 @@ import team.cnpm.DTOs.request.SoHoKhauRequestDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
 import team.cnpm.DTOs.response.SoHoKhauDetailDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
+import team.cnpm.exceptions.OwnerNotAvailableException;
+import team.cnpm.models.CongDan;
 import team.cnpm.models.SoHoKhau;
 import team.cnpm.repositories.SoHoKhauRepository;
+import team.cnpm.services.CongDanService;
 import team.cnpm.services.SoHoKhauService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -34,6 +37,8 @@ public class SoHoKhauController {
 	private SoHoKhauService soHoKhauService;
 	@Autowired
 	private SoHoKhauRepository soHoKhauRepo;
+	@Autowired
+	private CongDanService congDanService;
 	@GetMapping("/hoKhau")
 	public ResponseEntity<ResponseDTO> get(){
 //		try {
@@ -69,22 +74,18 @@ public class SoHoKhauController {
 //		}
 	}
 	@PostMapping("/hoKhau")
-	public ResponseEntity<ResponseDTO> post(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO){
-		try {
+	public ResponseEntity<ResponseDTO> post(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO) throws OwnerNotAvailableException{
+			CongDan owner = this.congDanService.get(soHoKhauRequestDTO.getOwnerId());
+				if(owner.getHoKhauSoHuu() != null) throw new OwnerNotAvailableException();
 			SoHoKhau hoKhauCreate = new SoHoKhau(soHoKhauRequestDTO.getAddress());
 			hoKhauCreate = this.soHoKhauService.save(hoKhauCreate);
 			SoHoKhau hoKhauUpdate = this.soHoKhauService.updateMembers(hoKhauCreate,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
-			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdate));
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
-					,HttpStatus.EXPECTATION_FAILED);
-			// TODO: handle exception
-		}
+//			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdate));
+			return ResponseEntity.ok(new ResponseDTO(true,this.soHoKhauService.entityToDetailDTO(hoKhauUpdate)));
 	}
 	@PutMapping("/hoKhau")
-	public ResponseEntity<ResponseDTO> put(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO){
+	public ResponseEntity<ResponseDTO> put(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO) throws OwnerNotAvailableException{
 		SoHoKhau hoKhauUpdate = this.soHoKhauService.update(soHoKhauRequestDTO);
 		SoHoKhau hoKhauUpdateMembers = this.soHoKhauService.updateMembers(hoKhauUpdate,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
@@ -96,11 +97,12 @@ public class SoHoKhauController {
 	@GetMapping("/hoKhau/search")
 	public ResponseEntity<ResponseDTO> search(
 			@RequestParam(name="firstname", required=false) String fname, 
-			@RequestParam(name="lastname", required=false) String lname){
-		List<SoHoKhau> shkList = this.soHoKhauService.findSHKByName(fname, lname);
+			@RequestParam(name="lastname", required=false) String lname,
+			@RequestParam(name="cccd", required=false) String cccd){
+		List<SoHoKhau> shkList = this.soHoKhauService.findSHKByName(fname, lname,cccd);
 		
-		List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
-		for(SoHoKhau shk : shkList) dtoList.add(this.soHoKhauService.entityToDTO(shk));
+		List<SoHoKhauDetailDTO> dtoList = new ArrayList<SoHoKhauDetailDTO>();
+		for(SoHoKhau shk : shkList) dtoList.add(this.soHoKhauService.entityToDetailDTO(shk));
 		
 		return ResponseEntity.ok(new ResponseDTO(true,dtoList));
 	}
