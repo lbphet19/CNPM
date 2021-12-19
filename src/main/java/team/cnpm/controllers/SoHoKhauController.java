@@ -86,6 +86,9 @@ public class SoHoKhauController {
 	}
 	@PutMapping("/hoKhau")
 	public ResponseEntity<ResponseDTO> put(@RequestBody SoHoKhauRequestDTO soHoKhauRequestDTO) throws OwnerNotAvailableException{
+		SoHoKhau shk = this.soHoKhauService.getByID(soHoKhauRequestDTO.getId());
+		CongDan owner = this.congDanService.get(soHoKhauRequestDTO.getOwnerId());
+		if(owner.getHoKhauSoHuu() != null && !shk.getOwner().equals(owner)) throw new OwnerNotAvailableException();
 		SoHoKhau hoKhauUpdate = this.soHoKhauService.update(soHoKhauRequestDTO);
 		SoHoKhau hoKhauUpdateMembers = this.soHoKhauService.updateMembers(hoKhauUpdate,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
