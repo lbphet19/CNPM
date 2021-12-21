@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -51,6 +52,7 @@ public class SoHoKhauController {
 			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 //		try {
+		HttpHeaders headers = new HttpHeaders();
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
@@ -69,9 +71,14 @@ public class SoHoKhauController {
 			
 			List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
 			for(SoHoKhau shk : list) dtoList.add(this.soHoKhauService.entityToDTO(shk));
-			SoHoKhauResponseDTOPagination shkResponse = new 
-					SoHoKhauResponseDTOPagination(dtoList,pg.getTotalElements(),pg.getSize()); 
-			return ResponseEntity.ok(new ResponseDTO(true,shkResponse));
+			
+			headers.set("totalElements",String.valueOf(pg.getTotalElements()));
+			headers.set("pageSize", String.valueOf(pg.getSize()));
+//			SoHoKhauResponseDTOPagination shkResponse = new 
+//					SoHoKhauResponseDTOPagination(dtoList,pg.getTotalElements(),pg.getSize()); 
+			return ResponseEntity.ok()
+					.headers(headers)
+					.body(new ResponseDTO(true,dtoList));
 			
 //			return ResponseEntity.ok(new ResponseDTO(true,list));
 //		} catch (Exception e) {
