@@ -5,66 +5,52 @@ import team.cnpm.models.DongGop;
 import team.cnpm.models.SoHoKhau;
 
 public class HKDongGopDTO {
-
-	private SoHoKhau hoKhau;
+	
+	
 	private String idHo;
 	private String tenChuHo;
+
 	private String address;
 	private String contact;
 	private int amount;
-	
-	
-
-	public String getAddress() {
-		return this.hoKhau.getAddress();
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
-	public String getContact() {
-		return this.hoKhau.getOwner().getPhoneNumber();
-	}
-
-	public void setContact(String contact) {
-		this.contact = contact;
-	}
-
-	public HKDongGopDTO(SoHoKhau hoKhau, int amount) {
+	public HKDongGopDTO(String idHo, String tenChuHo, String address, String contact, int amount) {
 		super();
-		this.hoKhau = hoKhau;
+		this.idHo = idHo;
+		this.tenChuHo = tenChuHo;
+		this.address = address;
+		this.contact = contact;
 		this.amount = amount;
 	}
-
-	public void setHoKhau(SoHoKhau hoKhau) {
-		this.hoKhau = hoKhau;
-	}
-
 	public String getIdHo() {
-		return this.hoKhau.getId();
+		return idHo;
 	}
-
 	public void setIdHo(String idHo) {
 		this.idHo = idHo;
 	}
-
 	public String getTenChuHo() {
-		return this.hoKhau.getOwner().getFirstName()+" "+this.hoKhau.getOwner().getLastName();
+		return tenChuHo;
 	}
-
 	public void setTenChuHo(String tenChuHo) {
 		this.tenChuHo = tenChuHo;
 	}
-
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
+	public String getContact() {
+		return contact;
+	}
+	public void setContact(String contact) {
+		this.contact = contact;
+	}
 	public int getAmount() {
 		return amount;
 	}
-
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
 	
-	
-	
 }
+

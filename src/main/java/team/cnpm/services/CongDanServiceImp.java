@@ -38,25 +38,27 @@ public class CongDanServiceImp implements CongDanService {
 	}
 	public CongDan update(CongDan congDanUpdate) {
 		CongDan congDan = this.congDanRepo.findById(congDanUpdate.getId()).get();
-		congDan.setAddress(congDanUpdate.getAddress());
-		congDan.setCanCuocCongDan(congDanUpdate.getCanCuocCongDan());
-		congDan.setDateOfBirth(congDanUpdate.getDateOfBirth());
-		congDan.setDepartmentTime(congDanUpdate.getDepartmentTime());
-		congDan.setFirstName(congDanUpdate.getFirstName());
-		congDan.setLastName(congDanUpdate.getLastName());
-		congDan.setGender(congDanUpdate.getGender());
-		congDan.setImage(congDanUpdate.getImage());
-		congDan.setJob(congDanUpdate.getJob());
-		congDan.setPhoneNumber(congDanUpdate.getPhoneNumber());
-		congDan.setRelationship(congDanUpdate.getRelationship());
-		congDan.setSpecialNotes(congDanUpdate.getSpecialNotes());
-		congDan.setStatus(congDanUpdate.getStatus());
-		return this.congDanRepo.save(congDan);
+		if(!congDanUpdate.getCanCuocCongDan().equals(congDan.getCanCuocCongDan()) && this.congDanRepo.existsByCanCuocCongDan(congDanUpdate.getCanCuocCongDan()))
+			return null;
+//		congDan.setAddress(congDanUpdate.getAddress());
+//		congDan.setCanCuocCongDan(congDanUpdate.getCanCuocCongDan());
+//		congDan.setDateOfBirth(congDanUpdate.getDateOfBirth());
+//		congDan.setDepartmentTime(congDanUpdate.getDepartmentTime());
+//		congDan.setFirstName(congDanUpdate.getFirstName());
+//		congDan.setLastName(congDanUpdate.getLastName());
+//		congDan.setGender(congDanUpdate.getGender());
+//		congDan.setImage(congDanUpdate.getImage());
+//		congDan.setJob(congDanUpdate.getJob());
+//		congDan.setPhoneNumber(congDanUpdate.getPhoneNumber());
+//		congDan.setRelationship(congDanUpdate.getRelationship());
+//		congDan.setSpecialNotes(congDanUpdate.getSpecialNotes());
+//		congDan.setStatus(congDanUpdate.getStatus());
+		return this.congDanRepo.save(congDanUpdate);
 	}
 	public String delete(int id) {
 		try {
 		this.congDanRepo.deleteById(id);
-		return "success";
+		return "Success";
 		}catch (Exception e) {
 			return "Error";
 			// TODO: handle exception
@@ -79,8 +81,8 @@ public class CongDanServiceImp implements CongDanService {
 	}
 	
 	public CongDanOfSHK_DTO entityToCDofSHK_DTO(CongDan cd) {
-		return new CongDanOfSHK_DTO(cd.getCanCuocCongDan(), cd.getFirstName(), cd.getLastName(), 
-				cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(),  cd.getRelationship(),
+		return new CongDanOfSHK_DTO(cd.getId(), cd.getCanCuocCongDan(), cd.getFirstName(), cd.getLastName(), 
+				cd.getAddress(), cd.getDateOfBirth(), cd.getPhoneNumber(), cd.getGender(), cd.getJob(),  cd.getRelationship(),
 				cd.getSpecialNotes(), cd.getStatus(), cd.getImage());
 	}
 	

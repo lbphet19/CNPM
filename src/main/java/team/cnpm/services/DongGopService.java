@@ -18,7 +18,8 @@ public interface DongGopService {
 	Page<DongGop> findAll(Pageable pageable);
 	ListDongGopDTO entityToDTO(DongGop dg);
 	DongGop getbyid(int id);
-	DongGopDetailsDTO entityToDetailsDTO(DongGop dg1);
-	List<DongGop> findEvent(String name, Date date);
+	DongGopDetailsDTO entityToDetailsDTOroi(DongGop dg1);
+	DongGopDetailsDTO entityToDetailsDTOchua(DongGop dg1);
+	List<DongGop> findEvent(String name, Date date, Pageable pageable);
 	
 }

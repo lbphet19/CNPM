@@ -1,6 +1,7 @@
 package team.cnpm.controllers;
 
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +11,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,17 +30,28 @@ import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
 import team.cnpm.models.CongDan;
+import team.cnpm.models.KhaiBao;
 import team.cnpm.repositories.CongDanRepository;
+import team.cnpm.repositories.KhaiBaoRepository;
 import team.cnpm.services.CongDanService;
+import team.cnpm.services.KhaiBaoService;
+import team.cnpm.specifications.KhaiBaoSpecification;
 
 @Controller
 @RequestMapping("/api")
+@CrossOrigin(origins = "*")
 public class CongDanController {
 	@Autowired
 	private CongDanService congDanService;
 	
 	@Autowired
 	private CongDanRepository congDanRepo;
+	
+	@Autowired
+	private KhaiBaoService khaiBaoService;
+	
+	@Autowired
+	private KhaiBaoRepository khaiBaoRepo;
 	
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/congDan")
@@ -110,9 +124,11 @@ public class CongDanController {
 		try {
 			CongDan congDanUpdate = this.congDanService.update(congDan);
 			if(congDanUpdate == null) 
-				System.out.println("Null");
-//				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
-//					,HttpStatus.EXPECTATION_FAILED);
+				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Can cuoc cong dan da ton tai!")
+					,HttpStatus.EXPECTATION_FAILED);
+			
+			this.khaiBaoService.updateKhaiBaoFromCD(congDanUpdate);
+			
 			return ResponseEntity.ok(new ResponseDTO(true,congDanUpdate));
 		} catch(Exception e) {
 			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
@@ -124,7 +140,7 @@ public class CongDanController {
 	@DeleteMapping("/congDan/delete/{id}")
 	public ResponseEntity<ResponseDTO> delete(@PathVariable(name="id") int id){
 		String stt = this.congDanService.delete(id);
-		if(stt == "success")
+		if(stt == "Success")
 			return ResponseEntity.ok(new ResponseDTO(true, stt));
 		else return ResponseEntity.ok(new ResponseDTO(false, stt));
 	}
@@ -148,9 +164,9 @@ public class CongDanController {
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname, 
 			@RequestParam(name="phonenumber", required=false) String sdt,
-			@RequestParam(name = "sortD", required = false) int sortD,
-			@RequestParam(name = "sortBy", required = false) String sortBy,
-			@RequestParam(name = "page", required = false) int page){
+			@RequestParam(name = "sortD", required = false, defaultValue = "1") int sortD,
+			@RequestParam(name = "sortBy", required = false, defaultValue = "firstName") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page){
 		Pageable pageable;
 		if(sortD==1) {
 			  pageable =  PageRequest.of(page-1, 3, Direction.DESC, sortBy);}
@@ -164,5 +180,38 @@ public class CongDanController {
 				
 				return ResponseEntity.ok(new ResponseDTO(true, cdDTO));
 	}
+	
+	@GetMapping("congDan/refresh")
+	public ResponseEntity<ResponseDTO> refresh(){
+		long millis=System.currentTimeMillis(); // lấy ngày hiện tại
+		Date curdate=new Date(millis);
+		//refresh Tạm trú
+		List<KhaiBao> listKBTT = this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm trú"))
+				.and(KhaiBaoSpecification.EtimeLessThan(curdate)));
+		
+		List<CongDan> cdTT = new ArrayList<CongDan>();
+		for(KhaiBao i : listKBTT) {
+			CongDan cd = this.khaiBaoService.getCDByKhaiBao(i);
+			if(cd != null && !cdTT.contains(cd)) cdTT.add(cd);
+		}
+		if(cdTT.size() != 0) this.congDanRepo.deleteAll(cdTT);  // xóa khỏi list nếu quá thời hạn tạm trú
+		
+		//refresh Tạm vắng
+		List<KhaiBao> listKBTV = this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm vắng"))
+				.and(KhaiBaoSpecification.EtimeLessThan(curdate)));
+		
+		List<CongDan> cdTV = new ArrayList<CongDan>();
+		for(KhaiBao i : listKBTV) {
+			CongDan cd = this.khaiBaoService.getCDByKhaiBao(i);
+			if(cd != null && !cdTV.contains(cd)) cdTV.add(cd);
+		}
+		if(cdTV.size() != 0) {
+			for(CongDan i: cdTV) i.setStatus("Đang ở");  // đặt về trạng thái đang ở nếu quá thời hạn
+			this.congDanRepo.saveAll(cdTV);
+		}
+		
+		return ResponseEntity.ok(new ResponseDTO(true, "Refresh successfully!"));
+	}
+	
 }
 

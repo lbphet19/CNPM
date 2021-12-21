@@ -18,7 +18,18 @@ public class ListDongGopDTO {
 	private String descriptions;
 	
 	public int tongtien;
+	public Integer mucphi;
 	
+	public Integer getMucphi() {
+		return mucphi;
+	}
+
+
+	public void setMucphi(Integer mucphi) {
+		this.mucphi = mucphi;
+	}
+
+
 	public int getTongtien() {
 		for(HoKhauDongGop i : this.listHoKhauDongGop)
 			if(i.getAmount() != 0) tongtien+=i.getAmount();
@@ -34,13 +45,14 @@ public class ListDongGopDTO {
 	private List<HoKhauDongGop> listHoKhauDongGop = new ArrayList<HoKhauDongGop>();
 
 	public ListDongGopDTO(int id, String eventName, Date date, String descriptions,
-			List<HoKhauDongGop> listHoKhauDongGop) {
+			List<HoKhauDongGop> listHoKhauDongGop, Integer mucphi) {
 		super();
 		this.id = id;
 		this.eventName = eventName;
 		this.date = date;
 		this.descriptions = descriptions;
 		this.listHoKhauDongGop = listHoKhauDongGop;
+		this.mucphi=mucphi;
 	}
 	
 

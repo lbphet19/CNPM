@@ -1,5 +1,7 @@
 package team.cnpm.controllers;
 
+import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,6 +10,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +23,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import team.cnpm.models.CongDan;
 import team.cnpm.models.ERole;
+import team.cnpm.models.KhaiBao;
 import team.cnpm.models.Role;
 import team.cnpm.models.User;
 import team.cnpm.payload.request.LoginRequest;
@@ -29,9 +34,12 @@ import team.cnpm.payload.response.JwtResponse;
 import team.cnpm.payload.response.MessageResponse;
 import team.cnpm.security.jwt.JwtUtils;
 import team.cnpm.security.services.UserDetailsImpl;
-
+import team.cnpm.specifications.KhaiBaoSpecification;
 import team.cnpm.repositories.UserRepository;
 import team.cnpm.repositories.RoleRepository;
+import team.cnpm.repositories.CongDanRepository;
+import team.cnpm.repositories.KhaiBaoRepository;
+import team.cnpm.services.KhaiBaoService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -51,6 +59,15 @@ public class AuthController {
 
 	@Autowired
 	JwtUtils jwtUtils;
+	
+	@Autowired
+	KhaiBaoRepository khaiBaoRepo;
+	
+	@Autowired
+	KhaiBaoService khaiBaoService;
+	
+	@Autowired
+	CongDanRepository congDanRepo;
 
 	@PostMapping("/signin")
 	public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -65,7 +82,37 @@ public class AuthController {
 		List<String> roles = userDetails.getAuthorities().stream()
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
-
+		
+		/*Refresh lại List mỗi khi sign in*/
+		long millis=System.currentTimeMillis(); // lấy ngày hiện tại
+		Date curdate=new Date(millis);
+		
+		//refresh Tạm trú
+		List<KhaiBao> listKBTT = this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm trú"))
+				.and(KhaiBaoSpecification.EtimeLessThan(curdate)));
+		
+		List<CongDan> cdTT = new ArrayList<CongDan>();
+		for(KhaiBao i : listKBTT) {
+			CongDan cd = this.khaiBaoService.getCDByKhaiBao(i);
+			if(cd != null && !cdTT.contains(cd)) cdTT.add(cd);
+		}
+		if(cdTT.size() != 0) this.congDanRepo.deleteAll(cdTT);  // xóa khỏi list nếu quá thời hạn tạm trú
+		
+		//refresh Tạm vắng
+		List<KhaiBao> listKBTV = this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm vắng"))
+				.and(KhaiBaoSpecification.EtimeLessThan(curdate)));
+		
+		List<CongDan> cdTV = new ArrayList<CongDan>();
+		for(KhaiBao i : listKBTV) {
+			CongDan cd = this.khaiBaoService.getCDByKhaiBao(i);
+			if(cd != null && !cdTV.contains(cd)) cdTV.add(cd);
+		}
+		if(cdTV.size() != 0) {
+			for(CongDan i: cdTV) i.setStatus("Đang ở");  // đặt về trạng thái đang ở nếu quá thời hạn
+			this.congDanRepo.saveAll(cdTV);
+		}
+		/*End refresh*/
+		
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getId(), 
 												 userDetails.getUsername(), 

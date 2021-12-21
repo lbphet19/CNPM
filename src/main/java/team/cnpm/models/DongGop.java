@@ -25,11 +25,20 @@ public class DongGop {
 	private Date date;
 	@Column(name = "Descriptions",columnDefinition = "nvarchar(200)")
 	private String descriptions;
+	@Column(name = "ContributionLimit")
+	private Integer mucphi;
+	
 	@OneToMany(mappedBy = "dongGop")
 	private List<HoKhauDongGop> listHoKhauDongGop = new ArrayList<HoKhauDongGop>();
 	
 	
 	
+	public Integer getMucphi() {
+		return mucphi;
+	}
+	public void setMucphi(int mucphi) {
+		this.mucphi = mucphi;
+	}
 	public int getId() {
 		return id;
 	}
@@ -60,11 +69,15 @@ public class DongGop {
 	public void setListHoKhauDongGop(List<HoKhauDongGop> listHoKhauDongGop) {
 		this.listHoKhauDongGop = listHoKhauDongGop;
 	}
-	public DongGop(String eventName, Date date, String descriptions, List<HoKhauDongGop> listHoKhauDongGop) {
+	
+	public DongGop(int id, String eventName, Date date, String descriptions, Integer mucphi,
+			List<HoKhauDongGop> listHoKhauDongGop) {
 		super();
+		this.id = id;
 		this.eventName = eventName;
 		this.date = date;
 		this.descriptions = descriptions;
+		this.mucphi = mucphi;
 		this.listHoKhauDongGop = listHoKhauDongGop;
 	}
 	public DongGop() {

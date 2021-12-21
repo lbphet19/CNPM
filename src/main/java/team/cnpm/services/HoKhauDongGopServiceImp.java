@@ -48,11 +48,16 @@ public class HoKhauDongGopServiceImp implements HoKhauDongGopService {
 	}
 
 	
+	
 	@Override
 	public HKDongGopDTO HKDongGopToHKDongGopDTO(HoKhauDongGop hkdg) {
-		return new HKDongGopDTO(hkdg.getSoHoKhau(), hkdg.getAmount());
+		return new HKDongGopDTO(hkdg.getSoHoKhau().getId(),
+				hkdg.getSoHoKhau().getOwner().getFirstName()+" "+hkdg.getSoHoKhau().getOwner().getLastName(),
+				hkdg.getSoHoKhau().getAddress(),
+				hkdg.getSoHoKhau().getOwner().getPhoneNumber(),
+				hkdg.getAmount());
 	}
-
+	
 	
 	
 	

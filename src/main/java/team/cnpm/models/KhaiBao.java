@@ -1,8 +1,6 @@
 package team.cnpm.models;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -12,17 +10,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 @Entity
-@Table(name = "CongDan")
-public class CongDan {
+@Table(name = "KhaiBao")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+public class KhaiBao {
 	@Id
 	@Column(name = "Id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +35,7 @@ public class CongDan {
 	@Column(name = "LastName",columnDefinition = "nvarchar(30)")
 	private String lastName;
 	
+	// địa chỉ tạm trú đối với người tạm trú / địa chỉ tạm vắng đối với người tạm vắng
 	@Column(name = "Address",columnDefinition = "nvarchar(200)")
 	private String address;
 	
@@ -48,34 +48,28 @@ public class CongDan {
 	@Column(name = "Job",columnDefinition = "nvarchar(100)")
 	private String job;
 	
-	@Column(name = "Specials",columnDefinition = "nvarchar(50)")
-	private String specialNotes;
-	
 	@Column(name = "Status",columnDefinition = "nvarchar(30)")
 	private String status;
 	
-	@Column(name = "DepartmentTime")
-	private Date departmentTime;
+	@Column(name = "StartTime")
+	private Date startTime;
 	
-	@Column(name = "Relationship",columnDefinition = "nvarchar(15)")
-	private String relationship;
+	@Column(name = "EndTime")
+	private Date endTime;
 	
-	@Column(name = "Img")
-	private String image;
-	
-	@JsonIgnore
-	@OneToOne(mappedBy = "owner")
-	private SoHoKhau hoKhauSoHuu;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JsonProperty(access = Access.WRITE_ONLY)
-	@JoinColumn(name = "IdSoHoKhau",referencedColumnName = "id")
-	private SoHoKhau hoKhau;
-	
-//	@OneToMany(mappedBy = "congDan")
-//	private List<SoHoKhauHistory> history = new ArrayList<SoHoKhauHistory>();
+	@Column(name = "ReasonDescription", columnDefinition = "nvarchar(200)")
+	private String reasonDescription;
 	
 	
+
+	public String getReasonDescription() {
+		return reasonDescription;
+	}
+
+	public void setReasonDescription(String reasonDescription) {
+		this.reasonDescription = reasonDescription;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -148,14 +142,6 @@ public class CongDan {
 		this.job = job;
 	}
 
-	public String getSpecialNotes() {
-		return specialNotes;
-	}
-
-	public void setSpecialNotes(String specialNotes) {
-		this.specialNotes = specialNotes;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -164,49 +150,40 @@ public class CongDan {
 		this.status = status;
 	}
 
-	public Date getDepartmentTime() {
-		return departmentTime;
+	public Date getStartTime() {
+		return startTime;
 	}
 
-	public void setDepartmentTime(Date departmentTime) {
-		this.departmentTime = departmentTime;
+	public void setStartTime(Date startTime) {
+		this.startTime = startTime;
 	}
 
-	public String getRelationship() {
-		return relationship;
+	public Date getEndTime() {
+		return endTime;
 	}
 
-	public void setRelationship(String relationship) {
-		this.relationship = relationship;
+	public void setEndTime(Date endTime) {
+		this.endTime = endTime;
 	}
+	
+	
 
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
-	}
-
-	public SoHoKhau getHoKhauSoHuu() {
-		return hoKhauSoHuu;
-	}
-
-	public void setHoKhauSoHuu(SoHoKhau hoKhauSoHuu) {
-		this.hoKhauSoHuu = hoKhauSoHuu;
-	}
-
-	public SoHoKhau getHoKhau() {
-		return hoKhau;
-	}
-
-	public void setHoKhau(SoHoKhau hoKhau) {
-		this.hoKhau = hoKhau;
-	}
-
-	public CongDan(String canCuocCongDan, String phoneNumber, String firstName, String lastName, String address,
-			Date dateOfBirth, String gender, String job, String status) {
+	public KhaiBao(String canCuocCongDan, String phoneNumber, String firstName, String lastName, Date dateOfBirth,
+			String gender, String job) {
 		super();
+		this.canCuocCongDan = canCuocCongDan;
+		this.phoneNumber = phoneNumber;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.dateOfBirth = dateOfBirth;
+		this.gender = gender;
+		this.job = job;
+	}
+
+	public KhaiBao(int id, String canCuocCongDan, String phoneNumber, String firstName, String lastName, String address,
+			Date dateOfBirth, String gender, String job, String status, Date startTime, Date endTime, String reasonDescription) {
+		super();
+		this.id = id;
 		this.canCuocCongDan = canCuocCongDan;
 		this.phoneNumber = phoneNumber;
 		this.firstName = firstName;
@@ -216,9 +193,13 @@ public class CongDan {
 		this.gender = gender;
 		this.job = job;
 		this.status = status;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.reasonDescription = reasonDescription;
 	}
 	
-	public CongDan() {};
+	public KhaiBao() {}
+	
 	
 	
 }

@@ -1,6 +1,6 @@
 package team.cnpm.services;
 
-import java.security.acl.Owner;
+//import java.security.acl.Owner;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,7 @@ import team.cnpm.DTOs.response.CongDanOfSHK_DTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.DTOs.response.SoHoKhauDetailDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
+import team.cnpm.exceptions.OwnerNotAvailableException;
 import team.cnpm.models.CongDan;
 import team.cnpm.models.SoHoKhau;
 import team.cnpm.models.SoHoKhauHistory;
@@ -81,25 +84,12 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		}
 	}
 
-	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<CongDanOfSHKRequestDTO> members) {
-		List<Integer> membersId = members.stream().map(congDan -> congDan.getId()).collect(Collectors.toList());
-//		if (idChuHo == 0) {
-//			if (hoKhau.getOwner() != null) {
-//				this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()), "Rời đi",
-//						hoKhau.getOwner(), hoKhau, null));
-//				hoKhau.getOwner().setHoKhauSoHuu(null);
-//				hoKhau.setOwner(null);
-//			}
-//		}
+	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<CongDanOfSHKRequestDTO> members) throws OwnerNotAvailableException {
 		CongDan chuHo = this.congDanRepo.findById(idChuHo).get();
+		if(chuHo.getHoKhauSoHuu() != null) throw new OwnerNotAvailableException();
+		List<Integer> membersId = members.stream().map(congDan -> congDan.getId()).collect(Collectors.toList());
 		CongDan oldChuHo = hoKhau.getOwner();
-//		if (idChuHo != 0)
-//			chuHo = this.congDanRepo.findById(idChuHo).get();
-//		else
-//			chuHo = null;
 		if (hoKhau.getOwner() == null || idChuHo != hoKhau.getOwner().getId()) {
-			// set chu Ho 1-1 voi ho khau
-			// check chuyen den, roi di...
 
 			if (hoKhau.getOwner() != null) {
 				if (!membersId.contains(hoKhau.getOwner().getId())) {
@@ -220,13 +210,13 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		return this.hoKhauRepo.findById(i).get();
 	}
 
-	public List<SoHoKhau> findSHKByName(String fname, String lname) {
+	public List<SoHoKhau> findSHKByName(String fname, String lname, String cccd,Pageable pageable) {
 		List<SoHoKhau> shk = new ArrayList<SoHoKhau>();
 
 		List<String> args = new ArrayList<String>();
 		args.add(fname);
 		args.add(lname);
-
+		args.add(cccd);
 		// Kiem tra neu all args = null => return shk (empty list)
 		int checkAllNull = 0;
 		for (int i = 0; i < args.size(); i++)
@@ -244,8 +234,10 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 
 		// Neu co it nhat 1 arg != null => tiep tuc truy van
 		Specification<SoHoKhau> spec = Specification.where(SHKSpecification.ownerFnameLike(args.get(0)))
-				.and(SHKSpecification.ownerLnameLike(args.get(1)));
-		shk = this.hoKhauRepo.findAll(spec);
+				.and(SHKSpecification.ownerLnameLike(args.get(1)))
+				.and(SHKSpecification.ownerCCCDLike(args.get(2)));
+		Page<SoHoKhau>  page= this.hoKhauRepo.findAll(spec,pageable);
+		shk=page.getContent();
 		return shk;
 	}
 

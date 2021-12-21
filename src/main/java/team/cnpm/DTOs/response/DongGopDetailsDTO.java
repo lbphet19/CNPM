@@ -8,6 +8,7 @@ import team.cnpm.models.HoKhauDongGop;
 
 public class DongGopDetailsDTO {
 
+	private int id;
 	private String eventName;
 
 	private Date date;
@@ -15,7 +16,22 @@ public class DongGopDetailsDTO {
 	private String descriptions;
 	
 	public int tongtien;
+	public Integer mucphi;
 	
+	
+	
+	public Integer getMucphi() {
+		return mucphi;
+	}
+	public void setMucphi(Integer mucphi) {
+		this.mucphi = mucphi;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public int getTongtien() {
 		for(HKDongGopDTO i : this.listHKDG)
 			if(i.getAmount() != 0) tongtien+=i.getAmount();
@@ -49,22 +65,22 @@ public class DongGopDetailsDTO {
 
 	private List<HKDongGopDTO> listHKDG = new ArrayList<HKDongGopDTO>();
 
-	private List<HKDongGopDTO> listHKChuaDG = new ArrayList<HKDongGopDTO>();
+	
 
 
-	public List<HKDongGopDTO> getListHKChuaDG() {
-		return listHKChuaDG;
-	}
-	public void setListHKChuaDG(List<HKDongGopDTO> listHKChuaDG) {
-		this.listHKChuaDG = listHKChuaDG;
-	}
-	public DongGopDetailsDTO(String eventName, Date date, String descriptions, List<HKDongGopDTO> listHKDG, List<HKDongGopDTO> listHKChuaDG) {
+	
+	
+	
+	
+	public DongGopDetailsDTO(int id, String eventName, Date date, String descriptions,
+			List<HKDongGopDTO> listHKDG, Integer mucphi) {
 		super();
+		this.id = id;
 		this.eventName = eventName;
 		this.date = date;
 		this.descriptions = descriptions;
+		this.mucphi = mucphi;
 		this.listHKDG = listHKDG;
-		this.listHKChuaDG = listHKChuaDG;
 	}
 	public List<HKDongGopDTO> getListHKDG() {
 		return listHKDG;
