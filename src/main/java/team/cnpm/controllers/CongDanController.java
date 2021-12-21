@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
+import team.cnpm.DTOs.response.ResponseDTOPagination;
 import team.cnpm.models.CongDan;
 import team.cnpm.models.KhaiBao;
 import team.cnpm.repositories.CongDanRepository;
@@ -56,35 +57,27 @@ public class CongDanController {
 	@PreAuthorize("hasRole('USER')")
 	@GetMapping("/congDan")
 	
-	public ResponseEntity<ResponseDTO> getpage(@RequestParam(name = "sortD", required = false, defaultValue = "1" ) Integer sortD,
+	public ResponseEntity<ResponseDTOPagination> getpage(@RequestParam(name = "sortD", required = false, defaultValue = "1" ) Integer sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "address") String sortBy,
-			@RequestParam(name = "page", required = false, defaultValue = "1") Integer page){
-		try {
+			@RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
 				 sort = Sort.by(sortBy).descending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 			else if(sortD==2) {
 				 sort = Sort.by(sortBy).ascending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 		
-			else { pageable =  PageRequest.of(page-1, 5);}
+			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
 			
 			Page<CongDan> pg =congDanService.findAll(pageable);
 			List<CongDan> list =pg.getContent();
 			List<CongDanResponseDTO> listDTO = new ArrayList<CongDanResponseDTO>();
 		for(CongDan c : list) listDTO.add(this.congDanService.entityToDTO(c));
-			return ResponseEntity.ok(new ResponseDTO(true, listDTO)); 
-			}
-		catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),
-					HttpStatus.EXPECTATION_FAILED);
-			
-		}
-
+			return ResponseEntity.ok(new ResponseDTOPagination(true, listDTO, pageSize,page,pg.getTotalElements())); 
 	}
 	
 //	@GetMapping("/congDan")
