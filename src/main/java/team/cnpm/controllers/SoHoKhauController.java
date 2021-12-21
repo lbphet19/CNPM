@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import team.cnpm.DTOs.request.SoHoKhauRequestDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
+import team.cnpm.DTOs.response.ResponseDTOPagination;
 import team.cnpm.DTOs.response.SoHoKhauDetailDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTOPagination;
@@ -47,12 +48,12 @@ public class SoHoKhauController {
 	private CongDanService congDanService;
 	
 	@GetMapping("/hoKhau")
-	public ResponseEntity<ResponseDTO> get(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+	public ResponseEntity<ResponseDTOPagination> get(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
 			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 //		try {
-		HttpHeaders headers = new HttpHeaders();
+//		HttpHeaders headers = new HttpHeaders();
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
@@ -72,21 +73,14 @@ public class SoHoKhauController {
 			List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
 			for(SoHoKhau shk : list) dtoList.add(this.soHoKhauService.entityToDTO(shk));
 			
-			headers.set("totalElements",String.valueOf(pg.getTotalElements()));
-			headers.set("pageSize", String.valueOf(pg.getSize()));
+//			headers.set("totalElements",String.valueOf(pg.getTotalElements()));
+//			headers.set("pageSize", String.valueOf(pg.getSize()));
 //			SoHoKhauResponseDTOPagination shkResponse = new 
 //					SoHoKhauResponseDTOPagination(dtoList,pg.getTotalElements(),pg.getSize()); 
-			return ResponseEntity.ok()
-					.headers(headers)
-					.body(new ResponseDTO(true,dtoList));
-			
-//			return ResponseEntity.ok(new ResponseDTO(true,list));
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
-//					,HttpStatus.EXPECTATION_FAILED);
-//			// TODO: handle exception
-//		}
+//			return ResponseEntity.ok()
+//					.headers(headers)
+//					.body(new ResponseDTO(true,dtoList));
+			return ResponseEntity.ok(new ResponseDTOPagination(true, dtoList, pageSize, page, pg.getTotalElements()));
 	}
 	@GetMapping("/hoKhau/{id}")
 	public ResponseEntity<ResponseDTO> getById(@PathVariable(name = "id")String id){
