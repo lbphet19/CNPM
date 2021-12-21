@@ -16,6 +16,7 @@ import team.cnpm.DTOs.request.SoHoKhauRequestDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
 import team.cnpm.DTOs.response.SoHoKhauDetailDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
+import team.cnpm.DTOs.response.SoHoKhauResponseDTOPagination;
 import team.cnpm.exceptions.OwnerNotAvailableException;
 import team.cnpm.models.CongDan;
 import team.cnpm.models.SoHoKhau;
@@ -47,18 +48,19 @@ public class SoHoKhauController {
 	@GetMapping("/hoKhau")
 	public ResponseEntity<ResponseDTO> get(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
-			@RequestParam(name = "page", required = false) int page){
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 //		try {
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
 				 sort = Sort.by(sortBy).descending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 			else if(sortD==2) {
 				 sort = Sort.by(sortBy).ascending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 		
-			else { pageable =  PageRequest.of(page-1, 5);}
+			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
 			
 			Page<SoHoKhau> pg =soHoKhauRepo.findAll(pageable);
@@ -67,8 +69,9 @@ public class SoHoKhauController {
 			
 			List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
 			for(SoHoKhau shk : list) dtoList.add(this.soHoKhauService.entityToDTO(shk));
-			
-			return ResponseEntity.ok(new ResponseDTO(true,dtoList));
+			SoHoKhauResponseDTOPagination shkResponse = new 
+					SoHoKhauResponseDTOPagination(dtoList,pg.getTotalElements(),pg.getSize()); 
+			return ResponseEntity.ok(new ResponseDTO(true,shkResponse));
 			
 //			return ResponseEntity.ok(new ResponseDTO(true,list));
 //		} catch (Exception e) {
