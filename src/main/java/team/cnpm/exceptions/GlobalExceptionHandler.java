@@ -13,13 +13,14 @@ import team.cnpm.DTOs.response.ResponseDTO;
 public class GlobalExceptionHandler {
     @ExceptionHandler(NoSuchElementException.class)  // Có thể bắt nhiều loại exception
     public ResponseEntity<ResponseDTO> handleExceptionA(NoSuchElementException e) {
-        return ResponseEntity.ok(new ResponseDTO(false,"No such people exists!"));
+        return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy công dân nào!"));
     }
     
     // Có thêm các @ExceptionHandler khác...
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ResponseDTO> handleAccessDeniedException(AccessDeniedException e){
-    	return ResponseEntity.ok(new ResponseDTO(false,"access is denied!"));
+    	return ResponseEntity.ok(new ResponseDTO(false,"Chưa đăng nhập hoặc phiên đăng nhập đã quá hạn,"
+    			+ " vui lòng thử lại!"));
     }
     
     @ExceptionHandler(OwnerNotAvailableException.class)
