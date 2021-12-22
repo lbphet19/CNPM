@@ -84,9 +84,9 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		}
 	}
 
-	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<CongDanOfSHKRequestDTO> members) throws OwnerNotAvailableException {
+	public SoHoKhau updateMembers(SoHoKhau hoKhau, int idChuHo, List<CongDanOfSHKRequestDTO> members){
 		CongDan chuHo = this.congDanRepo.findById(idChuHo).get();
-		if(chuHo.getHoKhauSoHuu() != null) throw new OwnerNotAvailableException();
+//		if(chuHo.getHoKhauSoHuu() != null) throw new OwnerNotAvailableException();
 		List<Integer> membersId = members.stream().map(congDan -> congDan.getId()).collect(Collectors.toList());
 		CongDan oldChuHo = hoKhau.getOwner();
 		if (hoKhau.getOwner() == null || idChuHo != hoKhau.getOwner().getId()) {
