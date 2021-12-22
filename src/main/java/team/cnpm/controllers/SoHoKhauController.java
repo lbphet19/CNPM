@@ -125,7 +125,7 @@ public class SoHoKhauController {
 	@GetMapping("/hoKhau/search")
 	public ResponseEntity<ResponseDTO> search(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
-			@RequestParam(name = "page", required = false) int page,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname,
 			@RequestParam(name="cccd", required=false) String cccd){
