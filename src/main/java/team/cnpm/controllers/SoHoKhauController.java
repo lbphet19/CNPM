@@ -143,7 +143,9 @@ public class SoHoKhauController {
 			
 		
 		List<SoHoKhau> shkList = this.soHoKhauService.findSHKByName(fname, lname,cccd,pageable);
-		
+		if(shkList.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy hộ khẩu nào tương ứng,"
+					+ " vui lòng kiểm tra lại danh sách"));
 		List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
 		for(SoHoKhau shk : shkList) dtoList.add(this.soHoKhauService.entityToDTO(shk));
 		
