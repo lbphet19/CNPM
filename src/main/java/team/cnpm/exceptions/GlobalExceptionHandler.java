@@ -2,6 +2,8 @@ package team.cnpm.exceptions;
 
 import java.util.NoSuchElementException;
 
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +28,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(OwnerNotAvailableException.class)
     public ResponseEntity<ResponseDTO> handleOwnerNotAvailableException(OwnerNotAvailableException e){
     	return ResponseEntity.ok(new ResponseDTO(false,"Người này đã là chủ hộ của một hộ khác!"));
+    }
+    
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ResponseDTO> handleEntityNotFoundException(EntityNotFoundException e){
+    	return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy thông tin đóng góp tương ứng!"));
     }
     
     // Nên bắt cả Exception.class

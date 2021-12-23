@@ -2,6 +2,7 @@ package team.cnpm.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import team.cnpm.DTOs.request.CongDanOfSHKRequestDTO;
@@ -23,7 +24,7 @@ public interface SoHoKhauService {
 	SoHoKhauResponseDTO entityToDTO(SoHoKhau shk);
 	SoHoKhauDetailDTO entityToDetailDTO(SoHoKhau shk);
 	SoHoKhau getByID(String i);
-	List<SoHoKhau> findSHKByName(String fname, String lname, String cccd,Pageable pageable);
+	Page<SoHoKhau> findSHKByName(String id, String fname, String lname, String cccd,Pageable pageable);
 
 	
 }

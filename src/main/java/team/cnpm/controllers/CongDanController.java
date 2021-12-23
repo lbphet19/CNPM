@@ -73,7 +73,7 @@ public class CongDanController {
 			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
 			
-			Page<CongDan> pg =congDanService.findAll(pageable);
+			Page<CongDan> pg = this.congDanService.findAll(pageable);
 			List<CongDan> list =pg.getContent();
 			List<CongDanResponseDTO> listDTO = new ArrayList<CongDanResponseDTO>();
 		for(CongDan c : list) listDTO.add(this.congDanService.entityToDTO(c));
@@ -153,25 +153,33 @@ public class CongDanController {
 //	}
 //}
 	@GetMapping("/congDan/search")
-	public ResponseEntity<ResponseDTO> search(@RequestParam(name ="cccd", required=false) String cccd, 
+	public ResponseEntity<Object> search(@RequestParam(name ="cccd", required=false) String cccd, 
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname, 
 			@RequestParam(name="phonenumber", required=false) String sdt,
 			@RequestParam(name = "sortD", required = false, defaultValue = "1") int sortD,
 			@RequestParam(name = "sortBy", required = false, defaultValue = "firstName") String sortBy,
-			@RequestParam(name = "page", required = false, defaultValue = "1") int page){
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 		Pageable pageable;
 		if(sortD==1) {
-			  pageable =  PageRequest.of(page-1, 3, Direction.DESC, sortBy);}
+			  pageable =  PageRequest.of(page-1, pageSize, Direction.DESC, sortBy);}
 		else if(sortD==2) {
-			  pageable =   PageRequest.of(page-1, 3, Direction.ASC, sortBy);}
-		else { pageable =  PageRequest.of(page-1, 3);}
-				List<CongDan> cd = this.congDanService.findCongDan(cccd, fname, lname, sdt,pageable);
+			  pageable =   PageRequest.of(page-1, pageSize, Direction.ASC, sortBy);}
+		else { pageable =  PageRequest.of(page-1, pageSize);}
+		
+		Page<CongDan> pg = this.congDanService.findCongDan(cccd, fname, lname, sdt,pageable);
+		
+		List<CongDan> cd = pg.getContent();
+		
+		if(cd.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy công dân nào tương ứng,"
+					+ " vui lòng kiểm tra lại danh sách"));
 							
-				List<CongDanResponseDTO> cdDTO= new ArrayList<CongDanResponseDTO>();
-				for(CongDan c : cd) cdDTO.add(this.congDanService.entityToDTO(c));
+		List<CongDanResponseDTO> cdDTO= new ArrayList<CongDanResponseDTO>();
+		for(CongDan c : cd) cdDTO.add(this.congDanService.entityToDTO(c));
 				
-				return ResponseEntity.ok(new ResponseDTO(true, cdDTO));
+		return ResponseEntity.ok(new ResponseDTOPagination(true, cdDTO, pageSize,page,pg.getTotalElements()));
 	}
 	
 	@GetMapping("congDan/refresh")

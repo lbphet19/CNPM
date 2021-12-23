@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -88,10 +89,10 @@ public class CongDanServiceImp implements CongDanService {
 	
 	
 	
-	public List<CongDan> findCongDan(String cccd, String fname, String lname, String sdt,Pageable pageable){
-	
-		Page<CongDan> page1= this.congDanRepo.findAll(pageable);
-		 List<CongDan> cdan =page1.getContent();
+	public Page<CongDan> findCongDan(String cccd, String fname, String lname, String sdt,Pageable pageable){
+//		List<CongDan> cdan = new ArrayList<CongDan>();
+		Page<CongDan> page = new PageImpl<CongDan>(new ArrayList<CongDan>());  // declare page
+		
 		List<String> args= new ArrayList<String>();
 		args.add(cccd); args.add(fname); args.add(lname); args.add(sdt);
 		
@@ -106,7 +107,7 @@ public class CongDanServiceImp implements CongDanService {
 				else args.set(i, args.get(i).trim());
 			else checkAllNull++;
 		
-		if( checkAllNull == args.size() ) return cdan;
+		if( checkAllNull == args.size() ) return page;
 		
 		//Neu co it nhat 1 arg != null => tiep tuc truy van
 		Specification<CongDan> spec = Specification
@@ -114,9 +115,9 @@ public class CongDanServiceImp implements CongDanService {
 				.and(CongDanSpecification.lNameLike(args.get(2))).and(CongDanSpecification.sdtLike(args.get(3)));
 		
 		
-		Page<CongDan> page= this.congDanRepo.findAll(spec,pageable);
-		 cdan =page.getContent();
-		return cdan;
+		page= this.congDanRepo.findAll(spec,pageable);
+//		cdan =page.getContent();
+		return page;
 	}
 
 	@Override

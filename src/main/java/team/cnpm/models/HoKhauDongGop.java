@@ -33,10 +33,10 @@ public class HoKhauDongGop {
 		this.dongGop = dongGop;
 		this.amount = amount;
 	}
-	public SoHoKhau getSoHoKhau() {
+	public SoHoKhau getHoKhau() {
 		return hoKhau;
 	}
-	public void setSoHoKhau(SoHoKhau hoKhau) {
+	public void setHoKhau(SoHoKhau hoKhau) {
 		this.hoKhau = hoKhau;
 	}
 	public DongGop getDongGop() {

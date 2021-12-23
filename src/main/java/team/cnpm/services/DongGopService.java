@@ -20,6 +20,6 @@ public interface DongGopService {
 	DongGop getbyid(int id);
 	DongGopDetailsDTO entityToDetailsDTOroi(DongGop dg1);
 	DongGopDetailsDTO entityToDetailsDTOchua(DongGop dg1);
-	List<DongGop> findEvent(String name, Date date, Pageable pageable);
+	Page<DongGop> findEvent(String name, Date date, Pageable pageable);
 	
 }

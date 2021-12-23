@@ -41,7 +41,7 @@ public class HoKhauDongGopServiceImp implements HoKhauDongGopService {
 	public HoKhauDongGop update(HoKhauDongGop HoKhauDongGopUpdate) {
 		HoKhauDongGop HoKhauDongGop = this.HoKhauDongGopRepo.findById(HoKhauDongGopUpdate.getId()).get();
 		HoKhauDongGop.setId(HoKhauDongGopUpdate.getId());
-		HoKhauDongGop.setSoHoKhau(HoKhauDongGopUpdate.getSoHoKhau());
+		HoKhauDongGop.setHoKhau(HoKhauDongGopUpdate.getHoKhau());
 		HoKhauDongGop.setDongGop(HoKhauDongGopUpdate.getDongGop());
 		HoKhauDongGop.setAmount(HoKhauDongGopUpdate.getAmount());
 		return this.HoKhauDongGopRepo.save(HoKhauDongGop);
@@ -51,10 +51,10 @@ public class HoKhauDongGopServiceImp implements HoKhauDongGopService {
 	
 	@Override
 	public HKDongGopDTO HKDongGopToHKDongGopDTO(HoKhauDongGop hkdg) {
-		return new HKDongGopDTO(hkdg.getSoHoKhau().getId(),
-				hkdg.getSoHoKhau().getOwner().getFirstName()+" "+hkdg.getSoHoKhau().getOwner().getLastName(),
-				hkdg.getSoHoKhau().getAddress(),
-				hkdg.getSoHoKhau().getOwner().getPhoneNumber(),
+		return new HKDongGopDTO(hkdg.getHoKhau().getId(),
+				hkdg.getHoKhau().getOwner().getFirstName()+" "+hkdg.getHoKhau().getOwner().getLastName(),
+				hkdg.getHoKhau().getAddress(),
+				hkdg.getHoKhau().getOwner().getPhoneNumber(),
 				hkdg.getAmount());
 	}
 	

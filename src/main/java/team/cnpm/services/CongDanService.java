@@ -18,7 +18,7 @@ public interface CongDanService {
 	CongDan save(CongDan congDan);
 	CongDan update(CongDan congDan);
 	String delete(int id);
-	List<CongDan> findCongDan(String cccd, String fname, String lname, String sdt,Pageable pageable);
+	Page<CongDan> findCongDan(String cccd, String fname, String lname, String sdt,Pageable pageable);
 	CongDanResponseDTO entityToDTO(CongDan congDan);
 	CongDanOfSHK_DTO entityToCDofSHK_DTO(CongDan cd);
 	CongDanDetailDTO entityToDetailDTO(CongDan cd);

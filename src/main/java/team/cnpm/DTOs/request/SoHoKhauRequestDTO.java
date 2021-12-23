@@ -3,8 +3,6 @@ package team.cnpm.DTOs.request;
 import java.util.ArrayList;
 import java.util.List;
 
-import team.cnpm.models.CongDan;
-
 public class SoHoKhauRequestDTO {
 //id address owner member
 	private String id;

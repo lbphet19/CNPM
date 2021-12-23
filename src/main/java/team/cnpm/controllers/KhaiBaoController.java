@@ -25,9 +25,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
+import team.cnpm.DTOs.response.ResponseDTOPagination;
+import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
 import team.cnpm.models.CongDan;
 import team.cnpm.models.DongGop;
 import team.cnpm.models.KhaiBao;
+import team.cnpm.models.SoHoKhau;
 import team.cnpm.repositories.CongDanRepository;
 import team.cnpm.services.CongDanService;
 import team.cnpm.services.KhaiBaoService;
@@ -48,27 +51,71 @@ public class KhaiBaoController {
 	Date curdate=new Date(millis);
 
 	@GetMapping("/khaiBaoTamTru")
-	public ResponseEntity<ResponseDTO> getTT(){
+	public ResponseEntity<Object> getTT(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 		try {
-				List<KhaiBao> listTT =this.khaiBaoService.getTamTru();
-				return ResponseEntity.ok(new ResponseDTO(true, listTT)); 
-			}
+			Pageable pageable;
+			Sort sort;
+				if(sortD==1) {
+					 sort = Sort.by(sortBy).descending();
+					  pageable =  PageRequest.of(page-1, pageSize,sort);}
+				else if(sortD==2) {
+					 sort = Sort.by(sortBy).ascending();
+					  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			
+				else { pageable =  PageRequest.of(page-1, pageSize);}
+			
+			Page<KhaiBao> pg = this.khaiBaoService.getTamTru(pageable);
+			
+			List<KhaiBao> listTT = pg.getContent();
+			
+			if(listTT.size() == 0)
+				return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy khai báo nào tương ứng,"
+						+ " vui lòng kiểm tra lại danh sách"));
+			
+			return ResponseEntity.ok(new ResponseDTOPagination(true, listTT, pageSize, page, pg.getTotalElements()));
+		}
 		catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),	
+			return new ResponseEntity<Object>(new ResponseDTO(false,"An error occurred!"),	
 					HttpStatus.EXPECTATION_FAILED);	
 		}
 	}
 	
 	@GetMapping("/khaiBaoTamVang")
-	public ResponseEntity<ResponseDTO> getTV(){
+	public ResponseEntity<Object> getTV(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 		try {
-				List<KhaiBao> listTV =this.khaiBaoService.getTamVang();
-				return ResponseEntity.ok(new ResponseDTO(true, listTV)); 
+			Pageable pageable;
+			Sort sort;
+				if(sortD==1) {
+					 sort = Sort.by(sortBy).descending();
+					  pageable =  PageRequest.of(page-1, pageSize,sort);}
+				else if(sortD==2) {
+					 sort = Sort.by(sortBy).ascending();
+					  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			
+				else { pageable =  PageRequest.of(page-1, pageSize);}
+				
+				
+				
+				Page<KhaiBao> pg = this.khaiBaoService.getTamVang(pageable);
+				
+				List<KhaiBao> listTV = pg.getContent();
+				
+				if(listTV.size() == 0)
+					return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy khai báo nào tương ứng,"
+							+ " vui lòng kiểm tra lại danh sách"));
+				
+				return ResponseEntity.ok(new ResponseDTOPagination(true, listTV, pageSize, page, pg.getTotalElements()));
 			}
 		catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),		
+			return new ResponseEntity<Object>(new ResponseDTO(false,"An error occurred!"),		
 					HttpStatus.EXPECTATION_FAILED);
 				
 		}
@@ -91,6 +138,7 @@ public class KhaiBaoController {
 		try {
 			
 			CongDan congDanTT = this.khaiBaoService.khaiBaoTTToCongDan(kbtt);
+			
 			// nếu đang trong thgian tạm trú mà KBTT chính người đó thì sẽ lỗi
 			if(congDanTT.getCanCuocCongDan() != null && this.congDanRepo.existsByCanCuocCongDan(congDanTT.getCanCuocCongDan()))
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Cong dan da ton tai!"),
@@ -114,14 +162,21 @@ public class KhaiBaoController {
 	public ResponseEntity<ResponseDTO> postTV(@RequestBody KhaiBao kbtv){
 		try {
 			
-			CongDan congDanTV = this.khaiBaoService.khaiBaoTVToCongDan(kbtv);
+			CongDan congDanTV = this.khaiBaoService.getCDByKhaiBao(kbtv);
+			
 			if(congDanTV == null) 
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Khong tim thay cong dan!"),
 					HttpStatus.EXPECTATION_FAILED);
+			//không thể khai báo tạm vắng cho người tạm trú hoặc đang tạm vắng
+			if(congDanTV.getStatus().equals("Tạm trú") || congDanTV.getStatus().equals("Tạm vắng"))
+				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Cong dan dang "+congDanTV.getStatus()+"!"),
+						HttpStatus.BAD_REQUEST);
+			
 			if(kbtv.getStartTime().compareTo(curdate) > 0 || kbtv.getEndTime().compareTo(curdate)<0) 
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Thoi gian khong hop le!"),
 						HttpStatus.BAD_REQUEST);
-			kbtv.setStatus(congDanTV.getStatus());
+			kbtv.setStatus("Tạm vắng");
+			this.khaiBaoService.khaiBaoTVToCongDan(kbtv);
 			KhaiBao kbtvCreate = this.khaiBaoService.save(kbtv);
 			return ResponseEntity.ok(new ResponseDTO(true,kbtvCreate));
 		} catch (Exception e) {
@@ -202,29 +257,67 @@ public class KhaiBaoController {
 	}
 	
 	@GetMapping("/khaiBaoTamTru/search")
-	public ResponseEntity<ResponseDTO> findKBTT(@RequestParam(name ="cccd", required=false) String cccd, 
+	public ResponseEntity<Object> findKBTT(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize,
+			@RequestParam(name ="cccd", required=false) String cccd, 
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname, 
 			@RequestParam(name="phonenumber", required=false) String sdt,
 			@RequestParam(name="starttime", required=false) Date startTime,
 			@RequestParam(name="endtime", required=false) Date endTime){
-
-				List<KhaiBao> kbtt = this.khaiBaoService.findKhaiBao("Tạm trú",cccd, fname, lname, sdt, startTime, endTime);
+		Pageable pageable;
+		Sort sort;
+			if(sortD==1) {
+				 sort = Sort.by(sortBy).descending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			else if(sortD==2) {
+				 sort = Sort.by(sortBy).ascending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+		
+			else { pageable =  PageRequest.of(page-1, pageSize);}
+			
+			Page<KhaiBao> pg = this.khaiBaoService.findKhaiBao("Tạm trú",cccd, fname, lname, sdt, startTime, endTime, pageable);
+			List<KhaiBao> kbtt = pg.getContent();
 				
-				return ResponseEntity.ok(new ResponseDTO(true, kbtt));
+			if(kbtt.size() == 0)
+				return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy khai báo nào tương ứng,"
+						+ " vui lòng kiểm tra lại danh sách"));
+			
+			return ResponseEntity.ok(new ResponseDTOPagination(true, kbtt, pageSize,page,pg.getTotalElements()));
 	}
 	
 	@GetMapping("/khaiBaoTamVang/search")
-	public ResponseEntity<ResponseDTO> findKBTV(@RequestParam(name ="cccd", required=false) String cccd, 
+	public ResponseEntity<Object> findKBTV(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize,
+			@RequestParam(name ="cccd", required=false) String cccd, 
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname, 
 			@RequestParam(name="phonenumber", required=false) String sdt,
 			@RequestParam(name="starttime", required=false) Date startTime,
 			@RequestParam(name="endtime", required=false) Date endTime){
-
-				List<KhaiBao> kbtt = this.khaiBaoService.findKhaiBao("Tạm vắng",cccd, fname, lname, sdt, startTime, endTime);
-				
-				return ResponseEntity.ok(new ResponseDTO(true, kbtt));
+		Pageable pageable;
+		Sort sort;
+			if(sortD==1) {
+				 sort = Sort.by(sortBy).descending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			else if(sortD==2) {
+				 sort = Sort.by(sortBy).ascending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+		
+			else { pageable =  PageRequest.of(page-1, pageSize);}
+		
+		Page<KhaiBao> pg = this.khaiBaoService.findKhaiBao("Tạm vắng",cccd, fname, lname, sdt, startTime, endTime, pageable);
+		List<KhaiBao> kbtv = pg.getContent();
+			
+		if(kbtv.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy khai báo nào tương ứng,"
+					+ " vui lòng kiểm tra lại danh sách"));
+		
+		return ResponseEntity.ok(new ResponseDTOPagination(true, kbtv, pageSize,page,pg.getTotalElements()));
 	}
 	
 	

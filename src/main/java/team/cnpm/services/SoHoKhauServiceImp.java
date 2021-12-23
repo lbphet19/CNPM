@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -210,10 +211,12 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 		return this.hoKhauRepo.findById(i).get();
 	}
 
-	public List<SoHoKhau> findSHKByName(String fname, String lname, String cccd,Pageable pageable) {
-		List<SoHoKhau> shk = new ArrayList<SoHoKhau>();
-
+	public Page<SoHoKhau> findSHKByName(String id, String fname, String lname, String cccd,Pageable pageable) {
+	//	List<SoHoKhau> shk = new ArrayList<SoHoKhau>();
+		Page<SoHoKhau>  page = new PageImpl<SoHoKhau>(new ArrayList<SoHoKhau>());  //declare Page
+		
 		List<String> args = new ArrayList<String>();
+		args.add(id);
 		args.add(fname);
 		args.add(lname);
 		args.add(cccd);
@@ -230,15 +233,16 @@ public class SoHoKhauServiceImp implements SoHoKhauService {
 				checkAllNull++;
 
 		if (checkAllNull == args.size())
-			return shk;
+			return page;
 
 		// Neu co it nhat 1 arg != null => tiep tuc truy van
-		Specification<SoHoKhau> spec = Specification.where(SHKSpecification.ownerFnameLike(args.get(0)))
-				.and(SHKSpecification.ownerLnameLike(args.get(1)))
-				.and(SHKSpecification.ownerCCCDLike(args.get(2)));
-		Page<SoHoKhau>  page= this.hoKhauRepo.findAll(spec,pageable);
-		shk=page.getContent();
-		return shk;
+		Specification<SoHoKhau> spec = Specification.where(SHKSpecification.idSHKLike(args.get(0)))
+				.and(SHKSpecification.ownerFnameLike(args.get(1)))
+				.and(SHKSpecification.ownerLnameLike(args.get(2)))
+				.and(SHKSpecification.ownerCCCDLike(args.get(3)));
+		page= this.hoKhauRepo.findAll(spec,pageable);
+
+		return page;
 	}
 
 	@Override

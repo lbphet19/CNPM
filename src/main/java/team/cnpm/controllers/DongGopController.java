@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.MutableSortDefinition;
+import org.springframework.beans.support.PagedListHolder;
+import org.springframework.beans.support.SortDefinition;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -89,17 +93,19 @@ public class DongGopController {
 	}
 	@GetMapping("/dongGop/{id}/notpayment")
 	public ResponseEntity<ResponseDTO> getDSChuaDongTienByID(@PathVariable(name = "id") int id, 
-			@RequestParam(name = "page", required = false) int page){
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "10") int pageSize){
 		try {
 			DongGop dg = this.dongGopService.getbyid(id);
-			Pageable pageable;
-			  pageable =  PageRequest.of(page-1, 5);
-
 			DongGopDetailsDTO dgDetail = this.dongGopService.entityToDetailsDTOchua(dg);
-			Page<HKDongGopDTO> page1 = new PageImpl<HKDongGopDTO> (dgDetail.getListHKDG(),pageable,dgDetail.getListHKDG().size());
-			List<HKDongGopDTO> list =page1.getContent();
+//			Page<HKDongGopDTO> page1 = new PageImpl<HKDongGopDTO> (dgDetail.getListHKDG(),pageable,dgDetail.getListHKDG().size());
+			PagedListHolder<HKDongGopDTO> page1 = new PagedListHolder<HKDongGopDTO>(dgDetail.getListHKDG());
+			page1.setPage(page-1);
+			page1.setPageSize(pageSize);
+			List<HKDongGopDTO> list =page1.getPageList();
+			dgDetail.setListHoKhauDongGop(list);
 			
-			return ResponseEntity.ok(new ResponseDTO(true,list));
+			return ResponseEntity.ok(new ResponseDTO(true,dgDetail));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),
@@ -108,17 +114,17 @@ public class DongGopController {
 		}
 		@GetMapping("/dongGop/{id}/payment")
 		public ResponseEntity<ResponseDTO> getDsDaDongTienByID(@PathVariable(name = "id") int id, 
-				@RequestParam(name = "page", required = false) int page){
+				@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+				@RequestParam(name = "pageSize",required = false, defaultValue = "10") int pageSize){
 			try {
 				DongGop dg = this.dongGopService.getbyid(id);
-				Pageable pageable;
-				  pageable =  PageRequest.of(page-1, 5);
-
 				DongGopDetailsDTO dgDetail = this.dongGopService.entityToDetailsDTOroi(dg);
-				Page<HKDongGopDTO> page1 = new PageImpl<HKDongGopDTO> (dgDetail.getListHKDG(),pageable,dgDetail.getListHKDG().size());
-				List<HKDongGopDTO> list =page1.getContent();
-				
-				return ResponseEntity.ok(new ResponseDTO(true,list));
+				PagedListHolder<HKDongGopDTO> page1 = new PagedListHolder<HKDongGopDTO>(dgDetail.getListHKDG());
+				page1.setPage(page-1);
+				page1.setPageSize(pageSize);
+				List<HKDongGopDTO> list =page1.getPageList();
+				dgDetail.setListHoKhauDongGop(list);
+				return ResponseEntity.ok(new ResponseDTO(true,dgDetail));
 			} catch (Exception e) {
 				e.printStackTrace();
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),
@@ -156,29 +162,35 @@ public class DongGopController {
 	}
 	
 	@GetMapping("/dongGop/search")
-	public ResponseEntity<ResponseDTO> search(@RequestParam(name="name", required=false) String name, 
+	public ResponseEntity<Object> search(@RequestParam(name="name", required=false) String name, 
 			@RequestParam(name="date", required=false) Date date,
 			@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
-			@RequestParam(name = "page", required = false) int page){
+			@RequestParam(name = "page", required = false, defaultValue= "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
 				 sort = Sort.by(sortBy).descending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 			else if(sortD==2) {
 				 sort = Sort.by(sortBy).ascending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 		
-			else { pageable =  PageRequest.of(page-1, 5);}
+			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
+		Page<DongGop> pg =	this.dongGopService.findEvent(name, date,pageable);
 			
-			
-		List<DongGop> listDG = this.dongGopService.findEvent(name, date,pageable);
+		List<DongGop> listDG = pg.getContent();
+		
+		if(listDG.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy đóng góp nào tương ứng,"
+					+ " vui lòng kiểm tra lại danh sách"));
 		
 		List<ListDongGopDTO> listDTO = new ArrayList<ListDongGopDTO>();
 		for(DongGop c : listDG) listDTO.add(this.dongGopService.entityToDTO(c));
-		return ResponseEntity.ok(new ResponseDTO(true, listDTO)); 
+		
+		return ResponseEntity.ok(new ResponseDTOPagination(true, listDTO, pageSize,page,pg.getTotalElements()));
 	}
 	@DeleteMapping("/dongGop/delete/{id}")
 	public ResponseEntity<ResponseDTO> delete(@PathVariable(name="id") int id){

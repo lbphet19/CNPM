@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,12 +31,12 @@ public class KhaiBaoServiceImp implements KhaiBaoService{
 	@Autowired
 	CongDanRepository congDanRepo;
 	
-	public List<KhaiBao> getTamTru(){
-		return this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm trú")));
+	public Page<KhaiBao> getTamTru(Pageable pageable){
+		return this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm trú")), pageable);
 	}
 	
-	public List<KhaiBao> getTamVang(){
-		return this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm vắng")));
+	public Page<KhaiBao> getTamVang(Pageable pageable){
+		return this.khaiBaoRepo.findAll(Specification.where(KhaiBaoSpecification.sttLike("Tạm vắng")), pageable);
 	}
 	
 	public KhaiBao get(int id) {
@@ -113,9 +115,10 @@ public class KhaiBaoServiceImp implements KhaiBaoService{
 		
 	}
 	
-	public List<KhaiBao> findKhaiBao(String stt, String cccd, String fname, String lname, String sdt, Date start, Date end){
+	public Page<KhaiBao> findKhaiBao(String stt, String cccd, String fname, String lname, String sdt, Date start, Date end, Pageable pageable){
+//		List<KhaiBao> listKBTT = new ArrayList<KhaiBao>();
 		
-		List<KhaiBao> listKBTT = new ArrayList<KhaiBao>();
+		Page<KhaiBao> page = new PageImpl<KhaiBao>(new ArrayList<KhaiBao>());
 		
 		List<String> args= new ArrayList<String>();
 		args.add(cccd); args.add(fname); args.add(lname); args.add(sdt);
@@ -131,7 +134,7 @@ public class KhaiBaoServiceImp implements KhaiBaoService{
 				else args.set(i, args.get(i).trim());
 			else checkAllNull++;
 		
-		if( checkAllNull == args.size() && start == null && end == null) return listKBTT;
+		if( checkAllNull == args.size() && start == null && end == null) return page;
 		
 		//Neu co it nhat 1 arg != null => tiep tuc truy van
 		
@@ -142,16 +145,16 @@ public class KhaiBaoServiceImp implements KhaiBaoService{
 		if(start != null && end != null) {
 			Specification<KhaiBao> spec1 = mainSpec.and((KhaiBaoSpecification.StimeLessThanOrEqualTo(start))
 				.and(KhaiBaoSpecification.EtimeGreaterThanOrEqualTo(end)));
-			listKBTT = this.khaiBaoRepo.findAll(spec1);
+			page = this.khaiBaoRepo.findAll(spec1, pageable);
 		}else if(start == null && end != null) {
 			Specification<KhaiBao> spec2 = mainSpec.and(KhaiBaoSpecification.StimeLessThanOrEqualTo(end));
-			listKBTT = this.khaiBaoRepo.findAll(spec2);
-		}else if(start == null && end != null) {
+			page = this.khaiBaoRepo.findAll(spec2, pageable);
+		}else if(start != null && end == null) {
 			Specification<KhaiBao> spec3 = mainSpec.and(KhaiBaoSpecification.EtimeGreaterThanOrEqualTo(start));
-			listKBTT = this.khaiBaoRepo.findAll(spec3);
-		}else listKBTT = this.khaiBaoRepo.findAll(mainSpec);
+			page = this.khaiBaoRepo.findAll(spec3, pageable);
+		}else page = this.khaiBaoRepo.findAll(mainSpec, pageable);
 		
-		return listKBTT;	
+		return page;	
 	}
 
 	public List<KhaiBao> updateKhaiBaoFromCD(CongDan congDanUpdate){

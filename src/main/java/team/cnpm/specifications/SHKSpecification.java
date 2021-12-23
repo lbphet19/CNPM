@@ -24,5 +24,11 @@ public class SHKSpecification {
 			criteriaBuilder.equal(root.get("owner").get("canCuocCongDan"), cccd);
 	}
 	
+	public static Specification<SoHoKhau> idSHKLike(String id){
+		if(id == null) return null;
+		return (root, query, criteriaBuilder)->
+			criteriaBuilder.equal(root.get("id"), id);
+	}
+	
 	
 }

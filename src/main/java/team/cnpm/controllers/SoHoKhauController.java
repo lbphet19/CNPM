@@ -1,5 +1,6 @@
 package team.cnpm.controllers;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,23 +9,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 
 import team.cnpm.DTOs.request.SoHoKhauRequestDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
 import team.cnpm.DTOs.response.ResponseDTOPagination;
+import team.cnpm.DTOs.response.SHKHistoryResponseDTO;
 import team.cnpm.DTOs.response.SoHoKhauDetailDTO;
 import team.cnpm.DTOs.response.SoHoKhauResponseDTO;
-import team.cnpm.DTOs.response.SoHoKhauResponseDTOPagination;
 import team.cnpm.exceptions.OwnerNotAvailableException;
 import team.cnpm.models.CongDan;
 import team.cnpm.models.SoHoKhau;
+import team.cnpm.models.SoHoKhauHistory;
+import team.cnpm.repositories.SoHoKhauHistoryRepository;
 import team.cnpm.repositories.SoHoKhauRepository;
 import team.cnpm.services.CongDanService;
 import team.cnpm.services.SoHoKhauService;
+import team.cnpm.services.SoHoKhauHistoryService;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -46,6 +48,11 @@ public class SoHoKhauController {
 	private SoHoKhauRepository soHoKhauRepo;
 	@Autowired
 	private CongDanService congDanService;
+	@Autowired
+	private SoHoKhauHistoryRepository soHoKhauHistoryRepo;
+	@Autowired
+	private SoHoKhauHistoryService soHoKhauHistoryService;
+	
 	
 	@GetMapping("/hoKhau")
 	public ResponseEntity<ResponseDTOPagination> get(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
@@ -66,7 +73,7 @@ public class SoHoKhauController {
 			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
 			
-			Page<SoHoKhau> pg =soHoKhauRepo.findAll(pageable);
+			Page<SoHoKhau> pg = this.soHoKhauRepo.findAll(pageable);
 			List<SoHoKhau> list =pg.getContent();
 			
 			
@@ -125,12 +132,108 @@ public class SoHoKhauController {
 		
 	}
 	@GetMapping("/hoKhau/search")
-	public ResponseEntity<ResponseDTO> search(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+	public ResponseEntity<Object> search(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
 			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
 			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize,
+			@RequestParam(name="id", required=false) String id,
 			@RequestParam(name="firstname", required=false) String fname, 
 			@RequestParam(name="lastname", required=false) String lname,
 			@RequestParam(name="cccd", required=false) String cccd){
+		Pageable pageable;
+		Sort sort;
+			if(sortD==1) {
+				 sort = Sort.by(sortBy).descending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			else if(sortD==2) {
+				 sort = Sort.by(sortBy).ascending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+		
+			else { pageable =  PageRequest.of(page-1, pageSize);}
+			
+		Page<SoHoKhau> pg = this.soHoKhauService.findSHKByName(id, fname, lname, cccd, pageable);	
+		List<SoHoKhau> shkList = pg.getContent();
+		
+		if(shkList.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy hộ khẩu nào tương ứng,"
+					+ " vui lòng kiểm tra lại danh sách"));
+		
+		List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
+		for(SoHoKhau shk : shkList) dtoList.add(this.soHoKhauService.entityToDTO(shk));
+		
+		return ResponseEntity.ok(new ResponseDTOPagination(true, dtoList, pageSize,page,pg.getTotalElements()));
+	}
+
+	@DeleteMapping("/hoKhau/delete/{id}")
+	public ResponseEntity<ResponseDTO> delete(@PathVariable(name="id") int id){
+		String stt = this.soHoKhauService.delete(id);
+		if(stt == "Success")
+			return ResponseEntity.ok(new ResponseDTO(true, stt));
+		else return ResponseEntity.ok(new ResponseDTO(false, stt));
+	}
+	
+	/*HISTORY*/
+	
+	@GetMapping("/shkHistory")
+	public ResponseEntity<ResponseDTOPagination> getHistory(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize){
+
+		Pageable pageable;
+		Sort sort;
+			if(sortD==1) {
+				 sort = Sort.by(sortBy).descending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+			else if(sortD==2) {
+				 sort = Sort.by(sortBy).ascending();
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
+		
+			else { pageable =  PageRequest.of(page-1, pageSize);}
+			
+			
+			Page<SoHoKhauHistory> pg = this.soHoKhauHistoryRepo.findAll(pageable);
+			List<SoHoKhauHistory> list =pg.getContent();
+			
+			List<SHKHistoryResponseDTO> dtoList = new ArrayList<SHKHistoryResponseDTO>();
+			for(SoHoKhauHistory shkhis : list) dtoList.add(this.soHoKhauHistoryService.shkHisToShkHisDTO(shkhis));
+			
+			return ResponseEntity.ok(new ResponseDTOPagination(true, dtoList, pageSize, page, pg.getTotalElements()));
+	}
+	
+	@GetMapping("/shkHistory/{id}")
+	public ResponseEntity<ResponseDTO> getOneHistory(@PathVariable(name = "id") int id){
+
+			SoHoKhauHistory shkHis = this.soHoKhauHistoryService.getByID(id);
+			
+			SHKHistoryResponseDTO shkHisDetail = this.soHoKhauHistoryService.shkHisToShkHisDTO(shkHis);
+			
+			return ResponseEntity.ok(new ResponseDTO(true,shkHisDetail));
+	}
+	
+	@DeleteMapping("/shkHistory/delete/{id}")
+	public ResponseEntity<ResponseDTO> deleteSHKHis(@PathVariable(name="id") int id){
+		String stt = this.soHoKhauHistoryService.delete(id);
+		if(stt == "Success")
+			return ResponseEntity.ok(new ResponseDTO(true, stt));
+		else return ResponseEntity.ok(new ResponseDTO(false, stt));
+	}
+	
+	
+	@GetMapping("/shkHistory/search")
+	public ResponseEntity<Object> searchSHKHis(@RequestParam(name = "sortD", required = false,defaultValue = "3") int sortD,
+			@RequestParam(name = "sortBy", required = false ,defaultValue = "id") String sortBy,
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@RequestParam(name = "pageSize",required = false, defaultValue = "9") int pageSize,
+//			@RequestParam(name="firstname", required=false) String fname, 
+//			@RequestParam(name="lastname", required=false) String lname,
+			@RequestParam(name="cccd", required=false) String cccd,
+//			@RequestParam(name="status", required=false) String status,
+//			@RequestParam(name="idHKRoiDi", required=false) String idRoiDi,
+//			@RequestParam(name="idHKChuyenDen", required=false) String idChuyenDen,
+			@RequestParam(name="idHoKhau", required=false) String idHoKhau,
+			@RequestParam(name="starttime", required=false) Date stime,
+			@RequestParam(name="endtime", required=false) Date etime){
 		Pageable pageable;
 		Sort sort;
 			if(sortD==1) {
@@ -144,20 +247,27 @@ public class SoHoKhauController {
 			
 			
 		
-		List<SoHoKhau> shkList = this.soHoKhauService.findSHKByName(fname, lname,cccd,pageable);
-		if(shkList.size() == 0)
-			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy hộ khẩu nào tương ứng,"
+//		List<SoHoKhauHistory> shkHisList = this.soHoKhauHistoryService.findSHKHistory(cccd, status, fname, lname, idRoiDi, idChuyenDen, stime, etime, pageable);
+		Page<SoHoKhauHistory> pg = this.soHoKhauHistoryService.findSHKHistory(cccd, idHoKhau, stime, etime, pageable);
+			
+		List<SoHoKhauHistory> shkHisList = pg.getContent();
+			
+		if(shkHisList.size() == 0)
+			return ResponseEntity.ok(new ResponseDTO(false,"Không tìm thấy lịch sử nào tương ứng,"
 					+ " vui lòng kiểm tra lại danh sách"));
-		List<SoHoKhauResponseDTO> dtoList = new ArrayList<SoHoKhauResponseDTO>();
-		for(SoHoKhau shk : shkList) dtoList.add(this.soHoKhauService.entityToDTO(shk));
 		
-		return ResponseEntity.ok(new ResponseDTO(true,dtoList));
+		List<SHKHistoryResponseDTO> dtoList = new ArrayList<SHKHistoryResponseDTO>();
+		for(SoHoKhauHistory shkhis : shkHisList) dtoList.add(this.soHoKhauHistoryService.shkHisToShkHisDTO(shkhis));
+		
+		return ResponseEntity.ok(new ResponseDTOPagination(true, dtoList, pageSize,page,pg.getTotalElements()));
 	}
-
-@DeleteMapping("/hoKhau/delete/{id}")
-public ResponseEntity<ResponseDTO> delete(@PathVariable(name="id") int id){
-	String stt = this.soHoKhauService.delete(id);
-	if(stt == "Success")
-		return ResponseEntity.ok(new ResponseDTO(true, stt));
-	else return ResponseEntity.ok(new ResponseDTO(false, stt));
-}}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}
