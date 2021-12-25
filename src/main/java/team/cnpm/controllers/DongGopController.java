@@ -220,7 +220,6 @@ public class DongGopController {
 	@PostMapping("/HKdongGop/add")
 	public ResponseEntity<ResponseDTO> addHK(@RequestBody HoKhauDongGop hkdg){  // cần tạo một HKDGRequestDTO
 		try {
-			
 			HoKhauDongGop hkdgCreate = this.HKDGService.save(hkdg);
 			return ResponseEntity.ok(new ResponseDTO(true,hkdgCreate));
 		} catch (Exception e) {

@@ -1,5 +1,7 @@
 package team.cnpm.models;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,6 +27,9 @@ public class HoKhauDongGop {
 	private DongGop dongGop;
 	@Column(name = "amount")
 	private int amount;
+	
+	@Column(name = "Time")
+	private Date time;
 	
 	
 	public HoKhauDongGop(SoHoKhau hoKhau, DongGop dongGop, int amount) {
@@ -56,6 +61,13 @@ public class HoKhauDongGop {
 	}
 	public void setId(int id) {
 		this.id = id;
+	}
+	
+	public Date getTime() {
+		return time;
+	}
+	public void setTime(Date time) {
+		this.time = time;
 	}
 	public HoKhauDongGop() {
 		super();

@@ -194,7 +194,6 @@ public class SoHoKhauController {
 			
 			Page<SoHoKhauHistory> pg = this.soHoKhauHistoryRepo.findAll(pageable);
 			List<SoHoKhauHistory> list =pg.getContent();
-			
 			List<SHKHistoryResponseDTO> dtoList = new ArrayList<SHKHistoryResponseDTO>();
 			for(SoHoKhauHistory shkhis : list) dtoList.add(this.soHoKhauHistoryService.shkHisToShkHisDTO(shkhis));
 			
