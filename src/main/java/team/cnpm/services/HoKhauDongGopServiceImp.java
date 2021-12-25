@@ -55,6 +55,7 @@ public class HoKhauDongGopServiceImp implements HoKhauDongGopService {
 				hkdg.getHoKhau().getOwner().getFirstName()+" "+hkdg.getHoKhau().getOwner().getLastName(),
 				hkdg.getHoKhau().getAddress(),
 				hkdg.getHoKhau().getOwner().getPhoneNumber(),
+				hkdg.getTime(),
 				hkdg.getAmount());
 	}
 	

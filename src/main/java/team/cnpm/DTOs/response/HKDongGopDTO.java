@@ -1,6 +1,8 @@
 package team.cnpm.DTOs.response;
 
 
+import java.sql.Date;
+
 import team.cnpm.models.DongGop;
 import team.cnpm.models.SoHoKhau;
 
@@ -12,6 +14,7 @@ public class HKDongGopDTO {
 
 	private String address;
 	private String contact;
+	private Date time;
 	private int amount;
 	public HKDongGopDTO(String idHo, String tenChuHo, String address, String contact, int amount) {
 		super();
@@ -51,6 +54,23 @@ public class HKDongGopDTO {
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
+	public Date getTime() {
+		return time;
+	}
+	public void setTime(Date time) {
+		this.time = time;
+	}
+	public HKDongGopDTO(String idHo, String tenChuHo, String address, String contact, Date time, int amount) {
+		super();
+		this.idHo = idHo;
+		this.tenChuHo = tenChuHo;
+		this.address = address;
+		this.contact = contact;
+		this.time = time;
+		this.amount = amount;
+	}
+	
+	
 	
 }
 
