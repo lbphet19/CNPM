@@ -137,7 +137,7 @@ public class DongGopController {
 		try {
 			
 			DongGop dongGopCreate = this.dongGopService.save(dongGop);
-			return ResponseEntity.ok(new ResponseDTO(true,dongGopCreate));
+			return ResponseEntity.ok(new ResponseDTO(true,new ListDongGopDTO(dongGopCreate)));
 		} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
@@ -153,7 +153,7 @@ public class DongGopController {
 				System.out.println("Null");
 //				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
 //					,HttpStatus.EXPECTATION_FAILED);
-			return ResponseEntity.ok(new ResponseDTO(true,dgupdate));
+			return ResponseEntity.ok(new ResponseDTO(true,new ListDongGopDTO(dgupdate)));
 		} catch(Exception e) {
 			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")
 					,HttpStatus.EXPECTATION_FAILED);

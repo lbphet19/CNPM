@@ -1,5 +1,7 @@
 package team.cnpm.DTOs.response;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,8 +49,9 @@ public class DongGopDetailsDTO {
 		this.eventName = eventName;
 	}
 
-	public Date getDate() {
-		return date;
+	public String getDate() {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+		return df.format(date);
 	}
 
 	public void setDate(Date date) {

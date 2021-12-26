@@ -2,6 +2,8 @@ package team.cnpm.DTOs.response;
 
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import team.cnpm.models.DongGop;
 import team.cnpm.models.SoHoKhau;
@@ -15,6 +17,7 @@ public class HKDongGopDTO {
 	private String address;
 	private String contact;
 	private Date time;
+//	private String time;
 	private int amount;
 	public HKDongGopDTO(String idHo, String tenChuHo, String address, String contact, int amount) {
 		super();
@@ -54,14 +57,27 @@ public class HKDongGopDTO {
 	public void setAmount(int amount) {
 		this.amount = amount;
 	}
-	public Date getTime() {
-		return time;
+	public String getTime() {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+		return df.format(time);
 	}
 	public void setTime(Date time) {
 		this.time = time;
 	}
+	
+	/* test 
+
+	 * */
+	
+	
+	/*end test */
+	
+//	public String getTime() {
+//		return time;
+//	}
 	public HKDongGopDTO(String idHo, String tenChuHo, String address, String contact, Date time, int amount) {
 		super();
+//		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		this.idHo = idHo;
 		this.tenChuHo = tenChuHo;
 		this.address = address;

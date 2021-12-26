@@ -1,42 +1,43 @@
 package team.cnpm.DTOs.response;
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import team.cnpm.models.DongGop;
 import team.cnpm.models.HoKhauDongGop;
 
 public class ListDongGopDTO {
-	
-	
+
 	private int id;
-	
+
 	private String eventName;
 
 	private Date date;
 
 	private String descriptions;
-	
+
 	public int tongtien;
 	public Integer mucphi;
-	
+
 	public Integer getMucphi() {
 		return mucphi;
 	}
-
 
 	public void setMucphi(Integer mucphi) {
 		this.mucphi = mucphi;
 	}
 
-
 	public int getTongtien() {
-		for(HoKhauDongGop i : this.listHoKhauDongGop)
-			if(i.getAmount() != 0) tongtien+=i.getAmount();
-			else continue;
+		for (HoKhauDongGop i : this.listHoKhauDongGop)
+			if (i.getAmount() != 0)
+				tongtien += i.getAmount();
+			else
+				continue;
 		return tongtien;
 	}
-
 
 	public void setTongtien(int tongtien) {
 		this.tongtien = tongtien;
@@ -52,9 +53,18 @@ public class ListDongGopDTO {
 		this.date = date;
 		this.descriptions = descriptions;
 		this.listHoKhauDongGop = listHoKhauDongGop;
-		this.mucphi=mucphi;
+		this.mucphi = mucphi;
 	}
-	
+
+	public ListDongGopDTO(DongGop dg) {
+		super();
+		this.id = dg.getId();
+		this.eventName = dg.getEventName();
+		this.date = dg.getDate();
+		this.descriptions = dg.getDescriptions();
+		this.listHoKhauDongGop = dg.getListHoKhauDongGop();
+		this.mucphi = dg.getMucphi();
+	}
 
 	public int getId() {
 		return id;
@@ -72,8 +82,9 @@ public class ListDongGopDTO {
 		this.eventName = eventName;
 	}
 
-	public Date getDate() {
-		return date;
+	public String getDate() {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+		return df.format(date);
 	}
 
 	public void setDate(Date date) {
