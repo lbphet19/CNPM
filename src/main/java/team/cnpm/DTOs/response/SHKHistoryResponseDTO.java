@@ -1,6 +1,8 @@
 package team.cnpm.DTOs.response;
 
 import java.sql.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
@@ -91,9 +93,10 @@ public class SHKHistoryResponseDTO {
 		return status;
 	}
 
-	public Date getDate() {
+	public String getDate() {
+		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		this.date = this.history.getDate();
-		return date;
+		return df.format(this.date);
 	}
 
 	public String getDescriptions() {
