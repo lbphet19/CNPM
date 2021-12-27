@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import team.cnpm.DTOs.request.CongDanRequestDTO;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.DTOs.response.ResponseDTO;
@@ -97,15 +98,15 @@ public class CongDanController {
 			CongDanDetailDTO cdDetail = this.congDanService.entityToDetailDTO(congDan);
 			return ResponseEntity.ok(new ResponseDTO(true,cdDetail));
 	}
-	@PostMapping("/congDan")
-	public ResponseEntity<ResponseDTO> post(@RequestBody CongDan congDan){
+	@PostMapping("/congDan") 
+	public ResponseEntity<ResponseDTO> post(@RequestBody CongDanRequestDTO congDan){
 		try {
 			if(congDan.getCanCuocCongDan() != null && this.congDanRepo.existsByCanCuocCongDan(congDan.getCanCuocCongDan()))
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Can cuoc cong dan da ton tai!"),
 						HttpStatus.BAD_REQUEST);
 			CongDan congDanCreate = this.congDanService.save(congDan);
-			return ResponseEntity.ok(new ResponseDTO(true,congDanCreate));
-		} catch (Exception e) {
+			return ResponseEntity.ok(new ResponseDTO(true,this.congDanService.entityToDTO(congDanCreate)));
+			} catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
 			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!"),

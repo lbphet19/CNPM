@@ -217,7 +217,27 @@ public class CongDan {
 		this.job = job;
 		this.status = status;
 	}
+
 	
+	public CongDan(String canCuocCongDan, String phoneNumber, String firstName, String lastName, String address,
+			Date dateOfBirth, String gender, String job, String specialNotes, String status, Date departmentTime,
+			String relationship, String image) {
+		super();
+		this.canCuocCongDan = canCuocCongDan;
+		this.phoneNumber = phoneNumber;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.address = address;
+		this.dateOfBirth = dateOfBirth;
+		this.gender = gender;
+		this.job = job;
+		this.specialNotes = specialNotes;
+		this.status = status;
+		this.departmentTime = departmentTime;
+		this.relationship = relationship;
+		this.image = image;
+	}
+
 	public CongDan() {}
 
 	@Override

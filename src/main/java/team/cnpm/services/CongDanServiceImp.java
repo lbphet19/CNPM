@@ -1,6 +1,8 @@
 package team.cnpm.services;
 
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,18 +14,25 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import team.cnpm.DTOs.request.CongDanOfSHKRequestDTO;
+import team.cnpm.DTOs.request.CongDanRequestDTO;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanOfSHK_DTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
 import team.cnpm.models.CongDan;
+import team.cnpm.models.SoHoKhau;
+import team.cnpm.models.SoHoKhauHistory;
 import team.cnpm.repositories.CongDanRepository;
+import team.cnpm.repositories.SoHoKhauRepository;
 import team.cnpm.specifications.CongDanSpecification;
 
 @Service
 public class CongDanServiceImp implements CongDanService {
 	@Autowired
 	private CongDanRepository congDanRepo;
-	
+	@Autowired
+	private SoHoKhauRepository shkRepo;
+	@Autowired
+	private SoHoKhauHistoryService shkHistoryService;
 	public List<CongDan> get(){
 		return this.congDanRepo.findAll();
 	}
@@ -36,6 +45,22 @@ public class CongDanServiceImp implements CongDanService {
 	}
 	public CongDan save(CongDan congDan) {
 		return this.congDanRepo.save(congDan);
+	}
+	public CongDan save(CongDanRequestDTO congDanDTO) {
+		CongDan congDanCreate = this.RequestDTOToEntity(congDanDTO);
+		if(congDanDTO.getIdSHK() != null) {
+			SoHoKhau shk = this.shkRepo.findById(congDanDTO.getIdSHK()).get();
+			congDanCreate.setHoKhau(shk);
+			congDanCreate = this.congDanRepo.save(congDanCreate);
+			this.shkHistoryService.save(new SoHoKhauHistory("Chuyển hộ", Date.valueOf(LocalDate.now()),
+					"Công dân " + congDanCreate.getFirstName() + " " + congDanCreate.getLastName() + " chuyển đến"
+					, congDanCreate, shk));
+		}
+		else {
+			congDanCreate = congDanRepo.save(congDanCreate);
+		}
+		return congDanCreate;
+			
 	}
 	public CongDan update(CongDan congDanUpdate) {
 		CongDan congDan = this.congDanRepo.findById(congDanUpdate.getId()).get();
@@ -65,17 +90,25 @@ public class CongDanServiceImp implements CongDanService {
 			// TODO: handle exception
 		}
 	}
-
+	public CongDan RequestDTOToEntity(CongDanRequestDTO dto) {
+		return new CongDan(dto.getCanCuocCongDan(),dto.getPhoneNumber(),dto.getFirstName()
+				,dto.getLastName(),dto.getAddress(),dto.getDateOfBirth(),dto.getGender(),
+				dto.getJob(),dto.getSpecialNotes(),dto.getStatus(),dto.getDepartmentTime(),
+				dto.getRelationship(),dto.getImage());
+	}
 
 	public CongDanResponseDTO entityToDTO(CongDan cd) {
+//		return new CongDanResponseDTO(cd.getId(),cd.getCanCuocCongDan(), cd.getPhoneNumber(), cd.getFirstName(), 
+//				cd.getLastName(), cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
+//				cd.getImage(), cd.getHoKhau()==null ? null : cd.getHoKhau().getId());
 		return new CongDanResponseDTO(cd.getId(),cd.getCanCuocCongDan(), cd.getPhoneNumber(), cd.getFirstName(), 
-				cd.getLastName(), cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
+				cd.getLastName(), cd.getHoKhau() == null? null: cd.getHoKhau().getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
 				cd.getImage(), cd.getHoKhau()==null ? null : cd.getHoKhau().getId());
 	}
 	
 	public CongDanDetailDTO entityToDetailDTO(CongDan cd) {
 		return new CongDanDetailDTO(cd.getId(), cd.getCanCuocCongDan(), cd.getPhoneNumber(), cd.getFirstName(),
-				cd.getLastName(), cd.getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
+				cd.getLastName(), cd.getHoKhau() == null ? null : cd.getHoKhau().getAddress(), cd.getDateOfBirth(), cd.getGender(), cd.getJob(), 
 				cd.getSpecialNotes(), cd.getStatus(), cd.getDepartmentTime(), cd.getRelationship(), cd.getImage(),
 				cd.getHoKhauSoHuu() == null ? null : cd.getHoKhauSoHuu().getId(), 
 				cd.getHoKhau() == null ? null : cd.getHoKhau().getId());

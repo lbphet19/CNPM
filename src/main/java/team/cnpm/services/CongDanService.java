@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import team.cnpm.DTOs.request.CongDanOfSHKRequestDTO;
+import team.cnpm.DTOs.request.CongDanRequestDTO;
 import team.cnpm.DTOs.response.CongDanDetailDTO;
 import team.cnpm.DTOs.response.CongDanOfSHK_DTO;
 import team.cnpm.DTOs.response.CongDanResponseDTO;
@@ -25,4 +26,5 @@ public interface CongDanService {
 	Page<CongDan> findAll(Pageable pageable);
 	CongDan updateRelationship(CongDan congDan);
 	CongDan updateRelationship(CongDanOfSHKRequestDTO congDan);
+	CongDan save(CongDanRequestDTO congDan);
 }
