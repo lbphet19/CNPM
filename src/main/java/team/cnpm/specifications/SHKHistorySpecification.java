@@ -32,10 +32,10 @@ public class SHKHistorySpecification {
 			criteriaBuilder.like(root.get("congDan").get("lastName"), "%"+lname+"%");
 	}
 	
-	public static Specification<SoHoKhauHistory> idRoiDiLike(String idRoiDi){
-		if(idRoiDi==null) return null;
+	public static Specification<SoHoKhauHistory> idSHKLike(String idSHK){
+		if(idSHK==null) return null;
 		return (root, query, criteriaBuilder)->
-			criteriaBuilder.like(root.get("hoKhauRoiDi").get("id"), idRoiDi);
+			criteriaBuilder.like(root.get("hoKhau").get("id"), idSHK);
 	}
 	
 	public static Specification<SoHoKhauHistory> idChuyenDenLike(String idChuyenDen){

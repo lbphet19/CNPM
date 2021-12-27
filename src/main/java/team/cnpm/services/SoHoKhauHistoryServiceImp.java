@@ -60,7 +60,7 @@ public class SoHoKhauHistoryServiceImp implements SoHoKhauHistoryService {
 	}
 	
 	public SHKHistoryResponseDTO shkHisToShkHisDTO(SoHoKhauHistory shkHis) {
-		return new SHKHistoryResponseDTO(shkHis, shkHis.getCongDan(), shkHis.getHoKhauRoiDi(), shkHis.getHoKhauChuyenDen());
+		return new SHKHistoryResponseDTO(shkHis, shkHis.getCongDan(), shkHis.getHoKhau());
 	}
 	
 	public SoHoKhauHistory getByID(int i) {
@@ -89,9 +89,10 @@ public class SoHoKhauHistoryServiceImp implements SoHoKhauHistoryService {
 		
 		//Neu co it nhat 1 arg != null => tiep tuc truy van
 		
+//		Specification<SoHoKhauHistory> mainSpec = Specification.where(SHKHistorySpecification.cccdLike(args.get(0)))
+//				.and(SHKHistorySpecification.idRoiDiLike(args.get(1))).or(SHKHistorySpecification.idChuyenDenLike(args.get(1)));
 		Specification<SoHoKhauHistory> mainSpec = Specification.where(SHKHistorySpecification.cccdLike(args.get(0)))
-				.and(SHKHistorySpecification.idRoiDiLike(args.get(1))).or(SHKHistorySpecification.idChuyenDenLike(args.get(1)));
-		
+				.and(SHKHistorySpecification.idSHKLike(args.get(1)));
 		
 		if(stime != null && etime != null) {
 			Specification<SoHoKhauHistory> spec1 = mainSpec.and((SHKHistorySpecification.dateLessThanOrEqualTo(etime))

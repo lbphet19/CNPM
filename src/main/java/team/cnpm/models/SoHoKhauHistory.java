@@ -26,7 +26,7 @@ public class SoHoKhauHistory {
 	//status: chuyển hộ, qua đời...
 	@Column(name = "Date")
 	private Date date;
-	@Column(name = "Descriptions", columnDefinition = "nvarchar(30)")
+	@Column(name = "Descriptions")
 	private String descriptions;
 	
 	@ManyToOne
@@ -34,79 +34,93 @@ public class SoHoKhauHistory {
 	private CongDan congDan;
 	
 	@ManyToOne
-	@JoinColumn(name = "HoKhauRoiDiId", referencedColumnName = "id")
-	private SoHoKhau hoKhauRoiDi;
+	@JoinColumn(name = "HoKhauId", referencedColumnName = "id")
+	private SoHoKhau hoKhau;
 	
-	@ManyToOne
-	@JoinColumn(name = "HoKhauChuyenDenId", referencedColumnName = "id")
-	private SoHoKhau hoKhauChuyenDen;
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public String getDescriptions() {
-		return descriptions;
-	}
-
-	public void setDescriptions(String descriptions) {
-		this.descriptions = descriptions;
-	}
-
-	public CongDan getCongDan() {
-		return congDan;
-	}
-
-	public void setCongDan(CongDan congDan) {
-		this.congDan = congDan;
-	}
-
-	public SoHoKhau getHoKhauRoiDi() {
-		return hoKhauRoiDi;
-	}
-
-	public void setHoKhauRoiDi(SoHoKhau hoKhauRoiDi) {
-		this.hoKhauRoiDi = hoKhauRoiDi;
-	}
-
-	public SoHoKhau getHoKhauChuyenDen() {
-		return hoKhauChuyenDen;
-	}
-
-	public void setHoKhauChuyenDen(SoHoKhau hoKhauChuyenDen) {
-		this.hoKhauChuyenDen = hoKhauChuyenDen;
-	}
-
-	public SoHoKhauHistory(String status, Date date, String descriptions, CongDan congDan, SoHoKhau hoKhauRoiDi,
-			SoHoKhau hoKhauChuyenDen) {
+	
+	
+	public SoHoKhauHistory(String status, Date date, String descriptions, CongDan congDan, SoHoKhau hoKhau) {
 		super();
 		this.status = status;
 		this.date = date;
 		this.descriptions = descriptions;
 		this.congDan = congDan;
-		this.hoKhauRoiDi = hoKhauRoiDi;
-		this.hoKhauChuyenDen = hoKhauChuyenDen;
+		this.hoKhau = hoKhau;
 	}
+
+
+
+	public int getId() {
+		return id;
+	}
+
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
+
+	public String getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+
+
+	public Date getDate() {
+		return date;
+	}
+
+
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+
+
+	public String getDescriptions() {
+		return descriptions;
+	}
+
+
+
+	public void setDescriptions(String descriptions) {
+		this.descriptions = descriptions;
+	}
+
+
+
+	public CongDan getCongDan() {
+		return congDan;
+	}
+
+
+
+	public void setCongDan(CongDan congDan) {
+		this.congDan = congDan;
+	}
+
+
+
+	public SoHoKhau getHoKhau() {
+		return hoKhau;
+	}
+
+
+
+	public void setHoKhau(SoHoKhau hoKhau) {
+		this.hoKhau = hoKhau;
+	}
+
+
 
 	public SoHoKhauHistory() {
 		super();

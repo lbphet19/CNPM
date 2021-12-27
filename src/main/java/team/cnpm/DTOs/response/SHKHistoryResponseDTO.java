@@ -26,17 +26,14 @@ public class SHKHistoryResponseDTO {
 	private String gender;
 	
 
-	private SoHoKhau hoKhauRoiDi;
-	private String hkRoiDiID;
-	
-	private SoHoKhau hoKhauChuyenDen;
-	private String hkChuyenDenID;
-	public SHKHistoryResponseDTO(SoHoKhauHistory history, CongDan congDan, SoHoKhau hoKhauRoiDi, SoHoKhau hoKhauChuyenDen) {
+	private SoHoKhau hoKhau;
+	private String hoKhauID;
+
+	public SHKHistoryResponseDTO(SoHoKhauHistory history, CongDan congDan, SoHoKhau hoKhau) {
 		super();
 		this.history = history;
 		this.congDan = congDan;
-		this.hoKhauRoiDi = hoKhauRoiDi;
-		this.hoKhauChuyenDen = hoKhauChuyenDen;
+		this.hoKhau = hoKhau;
 	}
 
 	public void setHistory(SoHoKhauHistory history) {
@@ -83,13 +80,11 @@ public class SHKHistoryResponseDTO {
 		this.gender = gender;
 	}
 
-	public void setHkRoiDiID(String hkRoiDiID) {
-		this.hkRoiDiID = hkRoiDiID;
-	}
 
-	public void setHkChuyenDenID(String hkChuyenDenID) {
-		this.hkChuyenDenID = hkChuyenDenID;
-	}
+//	public SoHoKhauHistory getHistory() {
+//		return history;
+//	}
+
 
 	public String getStatus() {
 		this.status = this.history.getStatus();
@@ -111,48 +106,43 @@ public class SHKHistoryResponseDTO {
 		this.congDan = congDan;
 	}
 	public String getFirstName() {
+		if(this.congDan == null) return null;
 		this.firstName = this.congDan.getFirstName();
 		return firstName;
 	}
 
 	public String getLastName() {
+		if(this.congDan == null) return null;
 		this.lastName = this.congDan.getLastName();
 		return lastName;
 	}
 
 	public String getCccd() {
+		if(this.congDan == null) return null;
 		this.cccd = this.congDan.getCanCuocCongDan();
 		return cccd;
 	}
 
 	public String getPhoneNum() {
+		if(this.congDan == null) return null;
 		this.phoneNum = this.congDan.getPhoneNumber();
 		return phoneNum;
 	}
 
 	public String getGender() {
+		if(this.congDan == null) return null;
 		this.gender = this.congDan.getGender();
 		return gender;
 	}
 
 
-	public void setHoKhauRoiDi(SoHoKhau hoKhauRoiDi) {
-		this.hoKhauRoiDi = hoKhauRoiDi;
+	public void setHoKhau(SoHoKhau hoKhau){
+		this.hoKhau = hoKhau;
 	}
-	public String getHkRoiDiID() {
-		if(this.hoKhauRoiDi == null) return null;
-		this.hkRoiDiID = this.hoKhauRoiDi.getId();
-		return hkRoiDiID;
-	}
-
-
-	public void setHoKhauChuyenDen(SoHoKhau hoKhauChuyenDen) {
-		this.hoKhauChuyenDen = hoKhauChuyenDen;
-	}
-	public String getHkChuyenDenID() {
-		if(this.hoKhauChuyenDen == null) return null;
-		this.hkChuyenDenID = this.hoKhauChuyenDen.getId();
-		return hkChuyenDenID;
+	public String getHoKhauID() {
+		if(this.hoKhau == null) return null;
+		this.hoKhauID = this.hoKhau.getId();
+		return hoKhauID;
 	}
 	
 

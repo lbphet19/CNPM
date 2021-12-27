@@ -1,6 +1,7 @@
 package team.cnpm.controllers;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +32,11 @@ import team.cnpm.models.CongDan;
 import team.cnpm.models.DongGop;
 import team.cnpm.models.KhaiBao;
 import team.cnpm.models.SoHoKhau;
+import team.cnpm.models.SoHoKhauHistory;
 import team.cnpm.repositories.CongDanRepository;
 import team.cnpm.services.CongDanService;
 import team.cnpm.services.KhaiBaoService;
+import team.cnpm.services.SoHoKhauHistoryService;
 
 @Controller
 @RequestMapping("/api")
@@ -46,6 +49,8 @@ public class KhaiBaoController {
 	CongDanService congDanService;
 	@Autowired
 	CongDanRepository congDanRepo;
+	@Autowired
+	private SoHoKhauHistoryService shkHistoryService;
 	
 	long millis=System.currentTimeMillis(); // lấy ngày hiện tại
 	Date curdate=new Date(millis);
@@ -148,7 +153,11 @@ public class KhaiBaoController {
 						HttpStatus.BAD_REQUEST);
 			kbtt.setStatus(congDanTT.getStatus());
 			KhaiBao kbttCreate = this.khaiBaoService.save(kbtt);
+			// luyu vao lich su
 			CongDan congDanCreate = this.congDanService.save(congDanTT);
+			this.shkHistoryService.save(new SoHoKhauHistory("Tạm trú", Date.valueOf(LocalDate.now()),
+					"Công dân " + congDanCreate.getFirstName() + " " + congDanCreate.getLastName() + " đăng ký tạm trú "+
+					" với lí do: " + kbttCreate.getReasonDescription(), congDanCreate, kbttCreate.getSoHoKhau()));
 			return ResponseEntity.ok(new ResponseDTO(true,kbttCreate));
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -176,8 +185,11 @@ public class KhaiBaoController {
 				return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"Thoi gian khong hop le!"),
 						HttpStatus.BAD_REQUEST);
 			kbtv.setStatus("Tạm vắng");
-			this.khaiBaoService.khaiBaoTVToCongDan(kbtv);
+			CongDan congDanUpdate = this.khaiBaoService.khaiBaoTVToCongDan(kbtv);
 			KhaiBao kbtvCreate = this.khaiBaoService.save(kbtv);
+			this.shkHistoryService.save(new SoHoKhauHistory("Tạm vắng", Date.valueOf(LocalDate.now()),
+					"Công dân " + congDanUpdate.getFirstName() + " " + congDanUpdate.getLastName() + " đăng ký tạm trú "+
+					" với lí do: " + kbtvCreate.getReasonDescription(), congDanUpdate, kbtvCreate.getSoHoKhau()));
 			return ResponseEntity.ok(new ResponseDTO(true,kbtvCreate));
 		} catch (Exception e) {
 			// TODO: handle exception

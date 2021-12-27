@@ -1,6 +1,7 @@
 package team.cnpm.controllers;
 
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,6 +112,10 @@ public class SoHoKhauController {
 				if(owner.getHoKhauSoHuu() != null) throw new OwnerNotAvailableException();
 			SoHoKhau hoKhauCreate = new SoHoKhau(soHoKhauRequestDTO.getAddress());
 			hoKhauCreate = this.soHoKhauService.save(hoKhauCreate);
+			// thêm vào lịch sử
+			this.soHoKhauHistoryRepo.save(new SoHoKhauHistory("Tạo hộ", Date.valueOf(LocalDate.now()),
+					"Thêm hộ mới có địa chỉ là "+ hoKhauCreate.getAddress(), null, hoKhauCreate));
+			
 			SoHoKhau hoKhauUpdate = this.soHoKhauService.updateMembers(hoKhauCreate,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
 //			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdate));
@@ -123,8 +128,13 @@ public class SoHoKhauController {
 		if(owner.getHoKhauSoHuu() != null && (shk.getOwner().getId() != owner.getId())) {
 			throw new OwnerNotAvailableException();
 		}
-		SoHoKhau hoKhauUpdate = this.soHoKhauService.update(soHoKhauRequestDTO);
-		SoHoKhau hoKhauUpdateMembers = this.soHoKhauService.updateMembers(hoKhauUpdate,
+		if(!soHoKhauRequestDTO.getAddress().equals(shk.getAddress())) {
+			this.soHoKhauHistoryService.save(new SoHoKhauHistory("Chỉnh sửa địa chỉ", Date.valueOf(LocalDate.now()),
+					"Địa chỉ " + shk.getAddress() + " được sửa thành "+
+					soHoKhauRequestDTO.getAddress(), null, shk));
+			shk = this.soHoKhauService.update(soHoKhauRequestDTO);
+		}
+		SoHoKhau hoKhauUpdateMembers = this.soHoKhauService.updateMembers(shk,
 					soHoKhauRequestDTO.getOwnerId(), soHoKhauRequestDTO.getMembers());
 			return ResponseEntity.ok(new ResponseDTO(true,hoKhauUpdateMembers));
 //			return new ResponseEntity<ResponseDTO>(new ResponseDTO(false,"An error occurred!")

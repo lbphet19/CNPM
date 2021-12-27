@@ -60,7 +60,9 @@ public class KhaiBao {
 	@Column(name = "ReasonDescription", columnDefinition = "nvarchar(200)")
 	private String reasonDescription;
 	
-	
+	@ManyToOne()
+	@JoinColumn(name = "IdSoHoKhau", referencedColumnName = "id")
+	private SoHoKhau soHoKhau;
 
 	public String getReasonDescription() {
 		return reasonDescription;
@@ -167,6 +169,14 @@ public class KhaiBao {
 	}
 	
 	
+
+	public SoHoKhau getSoHoKhau() {
+		return soHoKhau;
+	}
+
+	public void setSoHoKhau(SoHoKhau soHoKhau) {
+		this.soHoKhau = soHoKhau;
+	}
 
 	public KhaiBao(String canCuocCongDan, String phoneNumber, String firstName, String lastName, Date dateOfBirth,
 			String gender, String job) {
