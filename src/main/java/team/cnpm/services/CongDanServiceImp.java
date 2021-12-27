@@ -48,7 +48,7 @@ public class CongDanServiceImp implements CongDanService {
 	}
 	public CongDan save(CongDanRequestDTO congDanDTO) {
 		CongDan congDanCreate = this.RequestDTOToEntity(congDanDTO);
-		if(congDanDTO.getIdSHK() != null) {
+		if(congDanDTO.getIdSHK() != null && congDanDTO.getIdSHK().length() > 0) {
 			SoHoKhau shk = this.shkRepo.findById(congDanDTO.getIdSHK()).get();
 			congDanCreate.setHoKhau(shk);
 			congDanCreate = this.congDanRepo.save(congDanCreate);
