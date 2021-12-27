@@ -66,19 +66,19 @@ public class CongDanServiceImp implements CongDanService {
 		CongDan congDan = this.congDanRepo.findById(congDanUpdate.getId()).get();
 		if(!congDanUpdate.getCanCuocCongDan().equals(congDan.getCanCuocCongDan()) && this.congDanRepo.existsByCanCuocCongDan(congDanUpdate.getCanCuocCongDan()))
 			return null;
-//		congDan.setAddress(congDanUpdate.getAddress());
-//		congDan.setCanCuocCongDan(congDanUpdate.getCanCuocCongDan());
-//		congDan.setDateOfBirth(congDanUpdate.getDateOfBirth());
-//		congDan.setDepartmentTime(congDanUpdate.getDepartmentTime());
-//		congDan.setFirstName(congDanUpdate.getFirstName());
-//		congDan.setLastName(congDanUpdate.getLastName());
-//		congDan.setGender(congDanUpdate.getGender());
-//		congDan.setImage(congDanUpdate.getImage());
-//		congDan.setJob(congDanUpdate.getJob());
-//		congDan.setPhoneNumber(congDanUpdate.getPhoneNumber());
-//		congDan.setRelationship(congDanUpdate.getRelationship());
-//		congDan.setSpecialNotes(congDanUpdate.getSpecialNotes());
-//		congDan.setStatus(congDanUpdate.getStatus());
+		congDan.setAddress(congDanUpdate.getAddress());
+		congDan.setCanCuocCongDan(congDanUpdate.getCanCuocCongDan());
+		congDan.setDateOfBirth(congDanUpdate.getDateOfBirth());
+		congDan.setDepartmentTime(congDanUpdate.getDepartmentTime());
+		congDan.setFirstName(congDanUpdate.getFirstName());
+		congDan.setLastName(congDanUpdate.getLastName());
+		congDan.setGender(congDanUpdate.getGender());
+		congDan.setImage(congDanUpdate.getImage());
+		congDan.setJob(congDanUpdate.getJob());
+		congDan.setPhoneNumber(congDanUpdate.getPhoneNumber());
+		congDan.setRelationship(congDanUpdate.getRelationship());
+		congDan.setSpecialNotes(congDanUpdate.getSpecialNotes());
+		congDan.setStatus(congDanUpdate.getStatus());
 		return this.congDanRepo.save(congDanUpdate);
 	}
 	public String delete(int id) {
