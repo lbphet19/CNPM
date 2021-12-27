@@ -21,7 +21,7 @@ public class SoHoKhauHistory {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
 	// ra-vao, cong dan, ngay, mo ta
-	@Column(name = "Status", columnDefinition = "nvarchar(15)")
+	@Column(name = "Status")
 	private String status;
 	//status: chuyển hộ, qua đời...
 	@Column(name = "Date")
