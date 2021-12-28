@@ -58,6 +58,7 @@ public class HKDongGopDTO {
 		this.amount = amount;
 	}
 	public String getTime() {
+		if(time == null) return null;
 		DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 		return df.format(time);
 	}
