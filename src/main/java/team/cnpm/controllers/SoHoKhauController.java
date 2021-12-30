@@ -247,12 +247,12 @@ public class SoHoKhauController {
 		Sort sort;
 			if(sortD==1) {
 				 sort = Sort.by(sortBy).descending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 			else if(sortD==2) {
 				 sort = Sort.by(sortBy).ascending();
-				  pageable =  PageRequest.of(page-1, 5,sort);}
+				  pageable =  PageRequest.of(page-1, pageSize,sort);}
 		
-			else { pageable =  PageRequest.of(page-1, 5);}
+			else { pageable =  PageRequest.of(page-1, pageSize);}
 			
 			
 		
